@@ -1,3 +1,10 @@
 import { Routes } from '@angular/router';
 
-export const routes: Routes = [];
+import { ONBOARDING_ROUTES } from './features/onboarding.routes';
+
+export const routes: Routes = [
+  {
+    path: '',
+    children: ONBOARDING_ROUTES,
+  },
+];
