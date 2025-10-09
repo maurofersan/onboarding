@@ -10,7 +10,8 @@ import { Component, Input } from '@angular/core';
 export class TitleSectionComponent {
   @Input() titlePrefix: string = '';
   @Input() titleHighlight: string = '';
-  @Input() subtitle: string = '';
+  @Input() titleSufix?: string = '';
+  @Input() subtitle?: string = '';
   @Input() showSuccessIcon: boolean = false;
   @Input() successIcon: string = '✓';
 }

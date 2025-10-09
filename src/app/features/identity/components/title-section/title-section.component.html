@@ -2,7 +2,9 @@
   <h1 class="title-section__title">
     <span class="title-section__title__prefix">{{ titlePrefix }}</span>
     <span class="title-section__title__highlight">{{ titleHighlight }}</span>
-    @if (showSuccessIcon) {
+    @if (titleSufix) {
+    <span class="title-section__title__sufix">{{ titleSufix }}</span>
+    } @if (showSuccessIcon) {
     <span class="title-section__title__icon">{{ successIcon }}</span>
     }
   </h1>

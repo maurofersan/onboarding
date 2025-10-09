@@ -5,22 +5,24 @@
       (backClick)="goBack()"
     ></app-navigation>
 
-    <app-title-section
-      [titlePrefix]="getText('identity.dni-reverso.title.prefix')"
-      [titleHighlight]="getText('identity.dni-reverso.title.highlight')"
-      [subtitle]="getText('identity.dni-reverso.subtitle')"
-      [showSuccessIcon]="isCaptured"
-      [successIcon]="getText('identity.dni-reverso.success.icon')"
-    ></app-title-section>
+    <main class="dni-back-page__main">
+      <app-title-section
+        [titlePrefix]="getText('identity.dni-back.title.prefix')"
+        [titleHighlight]="getText('identity.dni-back.title.highlight')"
+        [titleSufix]="getText('identity.dni-back.title.suffix')"
+        [showSuccessIcon]="isCaptured"
+        [successIcon]="getText('identity.dni-back.success.icon')"
+      ></app-title-section>
 
-    <div class="dni-back-page__camera-container">
-      <app-camera
-        type="dni-back"
-        [isActive]="isCameraActive && !isCaptured"
-        (imageCaptured)="onImageCaptured($event)"
-        (cameraError)="onCameraError($event)"
-      ></app-camera>
-    </div>
+      <div class="dni-back-page__camera-container">
+        <app-camera
+          type="dni-back"
+          [isActive]="isCameraActive && !isCaptured"
+          (imageCaptured)="onImageCaptured($event)"
+          (cameraError)="onCameraError($event)"
+        ></app-camera>
+      </div>
+    </main>
 
     @if (errorMessage) {
     <div class="dni-back-page__error">

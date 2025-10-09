@@ -2,8 +2,8 @@
   "identity": {
     "onboarding": {
       "title": {
-        "prefix": "Ahora validemos tu",
-        "highlight": "identidad"
+        "prefix": "Ahora",
+        "highlight": "validemos tu identidad"
       },
       "subtitle": "Te pediremos fotos de tu DNI y una selfie",
       "instructions": {
@@ -18,24 +18,24 @@
       },
       "continueButton": "Continuar"
     },
-    "dni-frente": {
+    "dni-front": {
       "title": {
         "prefix": "Enfoca el",
-        "highlight": "frente"
+        "highlight": "frente",
+        "suffix": "de tu DNI"
       },
-      "subtitle": "de tu DNI",
       "instruction": "Por favor, mantén la posición",
       "success": {
         "title": "Foto realizada",
         "icon": "✓"
       }
     },
-    "dni-reverso": {
+    "dni-back": {
       "title": {
         "prefix": "Enfoca el",
-        "highlight": "reverso"
+        "highlight": "reverso",
+        "suffix": "de tu DNI"
       },
-      "subtitle": "de tu DNI",
       "instruction": "Por favor, mantén la posición",
       "success": {
         "title": "Foto realizada",

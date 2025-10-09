@@ -5,22 +5,24 @@
       (backClick)="goBack()"
     ></app-navigation>
 
-    <app-title-section
-      [titlePrefix]="getText('identity.dni-frente.title.prefix')"
-      [titleHighlight]="getText('identity.dni-frente.title.highlight')"
-      [subtitle]="getText('identity.dni-frente.subtitle')"
-      [showSuccessIcon]="isCaptured"
-      [successIcon]="getText('identity.dni-frente.success.icon')"
-    ></app-title-section>
+    <main class="dni-front-page__main">
+      <app-title-section
+        [titlePrefix]="getText('identity.dni-front.title.prefix')"
+        [titleHighlight]="getText('identity.dni-front.title.highlight')"
+        [titleSufix]="getText('identity.dni-front.title.suffix')"
+        [showSuccessIcon]="isCaptured"
+        [successIcon]="getText('identity.dni-front.success.icon')"
+      ></app-title-section>
 
-    <div class="dni-front-page__camera-container">
-      <app-camera
-        type="dni-front"
-        [isActive]="isCameraActive && !isCaptured"
-        (imageCaptured)="onImageCaptured($event)"
-        (cameraError)="onCameraError($event)"
-      ></app-camera>
-    </div>
+      <div class="dni-front-page__camera-container">
+        <app-camera
+          type="dni-front"
+          [isActive]="isCameraActive && !isCaptured"
+          (imageCaptured)="onImageCaptured($event)"
+          (cameraError)="onCameraError($event)"
+        ></app-camera>
+      </div>
+    </main>
 
     @if (errorMessage) {
     <div class="dni-front-page__error">

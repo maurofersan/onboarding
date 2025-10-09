@@ -2,7 +2,7 @@
   margin-bottom: 2rem;
 
   &__title {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 700;
     line-height: 1.2;
     margin: 0 0 1rem 0;
@@ -11,7 +11,8 @@
     gap: 0.5rem;
     flex-wrap: wrap;
 
-    &__prefix {
+    &__prefix,
+    &__sufix {
       color: #212529;
     }
 

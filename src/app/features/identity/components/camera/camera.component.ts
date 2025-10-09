@@ -72,7 +72,7 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
    */
   private setupVideoElement(video: HTMLVideoElement): void {
     // Clear any existing srcObject first
-    // video.srcObject = null;
+    video.srcObject = null;
 
     // Set video properties to ensure it displays correctly on mobile
     video.muted = true;
@@ -87,26 +87,66 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
     video.setAttribute('muted', 'true');
 
     // Additional mobile-specific attributes
-    if (this.isMobileDevice()) {
-      video.setAttribute('x-webkit-airplay', 'allow');
-      video.setAttribute('x5-video-player-type', 'h5');
-      video.setAttribute('x5-video-player-fullscreen', 'true');
-    }
+    // if (this.isMobileDevice()) {
+    video.setAttribute('x-webkit-airplay', 'allow');
+    video.setAttribute('x5-video-player-type', 'h5');
+    video.setAttribute('x5-video-player-fullscreen', 'true');
+    // }
+
+    // Log video element properties for debugging
+    console.log('Video element setup:', {
+      muted: video.muted,
+      autoplay: video.autoplay,
+      playsInline: video.playsInline,
+      preload: video.preload,
+      controls: video.controls,
+    });
   }
 
   /**
-   * Detects if the current device is mobile
-   * Following SOLID SRP - single responsibility for device detection
+   * Detects the best supported MIME type for video
    */
-  private isMobileDevice(): boolean {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
+  private getSupportedMimeType(): string | undefined {
+    const mimeTypes = [
+      'video/webm;codecs=vp8',
+      'video/webm;codecs=vp9',
+      'video/webm',
+      'video/mp4;codecs=h264',
+      'video/mp4',
+    ];
+
+    for (const mimeType of mimeTypes) {
+      if (MediaRecorder.isTypeSupported(mimeType)) {
+        console.log('Supported MIME type:', mimeType);
+        return mimeType;
+      }
+    }
+
+    console.log('No specific MIME type supported, using default');
+    return undefined;
+  }
+
+  /**
+   * Fallback method to get basic camera constraints without MIME type
+   */
+  private getFallbackConstraints(): MediaStreamConstraints {
+    const isSelfie = this.type === 'selfie';
+    const facingMode = isSelfie ? 'user' : 'environment';
+    // const facingMode = 'user';
+
+    return {
+      video: {
+        facingMode,
+        width: { ideal: 1280, min: 640 },
+        height: { ideal: 720, min: 480 },
+        frameRate: { ideal: 30, max: 60 },
+      },
+      audio: false,
+    };
   }
 
   /**
    * Sets up video event handlers for proper video playback
-   * Following SOLID SRP - single responsibility for event handling
    */
   private setupVideoEventHandlers(video: HTMLVideoElement): void {
     // Wait for video to be ready
@@ -117,7 +157,10 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
         'x',
         video.videoHeight
       );
+      console.log('Video srcObject:', video.srcObject);
+      console.log('Video readyState:', video.readyState);
 
+      // Force play immediately after metadata loads
       video
         .play()
         .then(() => {
@@ -148,6 +191,14 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
       console.log('Video load started');
     };
 
+    video.onloadeddata = () => {
+      console.log('Video data loaded');
+    };
+
+    video.oncanplaythrough = () => {
+      console.log('Video can play through');
+    };
+
     // Force play after a short delay if autoplay fails
     setTimeout(() => {
       if (video.paused) {
@@ -157,6 +208,16 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
         });
       }
     }, 1000);
+
+    // Additional timeout for mobile devices
+    setTimeout(() => {
+      if (video.paused) {
+        console.log('Video still paused after 2 seconds, forcing play...');
+        video.play().catch((error) => {
+          console.error('Failed to force play video:', error);
+        });
+      }
+    }, 2000);
   }
 
   async initializeCamera(): Promise<void> {
@@ -176,29 +237,62 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
       // Check if we're in a secure context (HTTPS or localhost)
       if (!window.isSecureContext) {
         console.log('window.isSecureContext::', window.isSecureContext);
-        // throw new Error('Camera access requires HTTPS or localhost');
+        throw new Error('Camera access requires HTTPS or localhost');
       }
 
       const constraints = this.getCameraConstraints();
 
       console.log('Requesting camera access with constraints:', constraints);
 
-      // Request camera permission
-      this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+      try {
+        // Request camera permission
+        this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+        console.log(
+          'Camera access granted with MIME type, stream:',
+          this.stream
+        );
+      } catch (mimeError) {
+        console.log(
+          'Failed with MIME type, trying fallback constraints:',
+          mimeError
+        );
 
-      console.log('Camera access granted, stream:', this.stream);
+        // Try with fallback constraints (without MIME type)
+        const fallbackConstraints = this.getFallbackConstraints();
+        console.log('Trying fallback constraints:', fallbackConstraints);
+
+        this.stream = await navigator.mediaDevices.getUserMedia(
+          fallbackConstraints
+        );
+        console.log(
+          'Camera access granted with fallback, stream:',
+          this.stream
+        );
+      }
 
       if (this.videoElement && this.stream) {
         const video = this.videoElement.nativeElement;
         console.log('video::', video);
         console.log('this.stream::', this.stream);
 
-        // Setup video element properties
+        // Setup video element properties first
         this.setupVideoElement(video);
+
         // Set the stream
         video.srcObject = this.stream;
+
         // Setup video event handlers
         this.setupVideoEventHandlers(video);
+
+        // Force immediate play attempt
+        setTimeout(() => {
+          if (video.srcObject && video.paused) {
+            console.log('Attempting immediate play...');
+            video.play().catch((error) => {
+              console.error('Immediate play failed:', error);
+            });
+          }
+        }, 100);
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
@@ -281,8 +375,9 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
    */
   private getCameraConstraints(): MediaStreamConstraints {
     const isSelfie = this.type === 'selfie';
-    const facingMode =
-      !this.isMobileDevice() || isSelfie ? 'user' : 'environment';
+
+    // Correct facing mode logic: selfie uses front camera, DNI uses rear camera
+    const facingMode = isSelfie ? 'user' : 'environment';
 
     // Base constraints that work well on mobile
     const baseConstraints: MediaStreamConstraints = {
@@ -294,6 +389,12 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
       },
       audio: false,
     };
+
+    // Add MIME type if supported
+    const mimeType = this.getSupportedMimeType();
+    if (mimeType) {
+      (baseConstraints.video as any).mimeType = mimeType;
+    }
     console.log('baseConstraints::', baseConstraints);
 
     // Add aspect ratio for better mobile compatibility

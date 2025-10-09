@@ -1,5 +1,8 @@
 <div class="camera">
-  <div class="camera__container">
+  <div
+    class="camera__container"
+    [class.camera__container--selfie]="type === 'selfie'"
+  >
     <video
       #videoElement
       class="camera__video"
@@ -11,10 +14,11 @@
       [style.transform]="type === 'selfie' ? 'scaleX(-1)' : 'none'"
       preload="none"
     ></video>
+    <!-- controls="false" -->
 
-    <div class="camera__overlay" [class]="'camera__overlay ' + overlayClass">
+    <!-- <div class="camera__overlay" [class]="'camera__overlay ' + overlayClass">
       <div class="camera__overlay__frame"></div>
-    </div>
+    </div> -->
 
     @if (isActive) {
     <div class="camera__controls">

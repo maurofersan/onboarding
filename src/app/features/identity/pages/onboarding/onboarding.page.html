@@ -5,21 +5,23 @@
       (backClick)="goBack()"
     ></app-navigation>
 
-    <app-title-section
-      [titlePrefix]="getText('identity.onboarding.title.prefix')"
-      [titleHighlight]="getText('identity.onboarding.title.highlight')"
-      [subtitle]="getText('identity.onboarding.subtitle')"
-    ></app-title-section>
+    <main class="onboarding-page__main">
+      <app-title-section
+        [titlePrefix]="getText('identity.onboarding.title.prefix')"
+        [titleHighlight]="getText('identity.onboarding.title.highlight')"
+        [subtitle]="getText('identity.onboarding.subtitle')"
+      ></app-title-section>
 
-    <app-instructions [instructions]="instructions"></app-instructions>
+      <app-instructions [instructions]="instructions"></app-instructions>
 
-    <app-consent
-      [textPrefix]="getText('identity.onboarding.consent.text')"
-      [textHighlight]="getText('identity.onboarding.consent.highlight')"
-      [textSuffix]="getText('identity.onboarding.consent.suffix')"
-      [checked]="biometricConsent"
-      (consentChange)="onConsentChange($event)"
-    ></app-consent>
+      <app-consent
+        [textPrefix]="getText('identity.onboarding.consent.text')"
+        [textHighlight]="getText('identity.onboarding.consent.highlight')"
+        [textSuffix]="getText('identity.onboarding.consent.suffix')"
+        [checked]="biometricConsent"
+        (consentChange)="onConsentChange($event)"
+      ></app-consent>
+    </main>
 
     <div class="onboarding-page__actions">
       <button
