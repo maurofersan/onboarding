@@ -72,7 +72,7 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
    */
   private setupVideoElement(video: HTMLVideoElement): void {
     // Clear any existing srcObject first
-    video.srcObject = null;
+    // video.srcObject = null;
 
     // Set video properties to ensure it displays correctly on mobile
     video.muted = true;
@@ -175,7 +175,8 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
 
       // Check if we're in a secure context (HTTPS or localhost)
       if (!window.isSecureContext) {
-        throw new Error('Camera access requires HTTPS or localhost');
+        console.log('window.isSecureContext::', window.isSecureContext);
+        // throw new Error('Camera access requires HTTPS or localhost');
       }
 
       const constraints = this.getCameraConstraints();
@@ -189,13 +190,13 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
 
       if (this.videoElement && this.stream) {
         const video = this.videoElement.nativeElement;
+        console.log('video::', video);
+        console.log('this.stream::', this.stream);
 
         // Setup video element properties
         this.setupVideoElement(video);
-
         // Set the stream
         video.srcObject = this.stream;
-
         // Setup video event handlers
         this.setupVideoEventHandlers(video);
       }
@@ -280,17 +281,20 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
    */
   private getCameraConstraints(): MediaStreamConstraints {
     const isSelfie = this.type === 'selfie';
+    const facingMode =
+      !this.isMobileDevice() || isSelfie ? 'user' : 'environment';
 
     // Base constraints that work well on mobile
     const baseConstraints: MediaStreamConstraints = {
       video: {
-        facingMode: isSelfie ? 'user' : 'environment',
+        facingMode,
         width: { ideal: 1920, min: 640 },
         height: { ideal: 1080, min: 480 },
         frameRate: { ideal: 30, max: 60 },
       },
       audio: false,
     };
+    console.log('baseConstraints::', baseConstraints);
 
     // Add aspect ratio for better mobile compatibility
     if (isSelfie) {

@@ -8,6 +8,7 @@
       muted
       webkit-playsinline
       [class.camera__video--active]="isActive"
+      [style.transform]="type === 'selfie' ? 'scaleX(-1)' : 'none'"
       preload="none"
     ></video>
 
