@@ -1,0 +1,29 @@
+<div class="success-page">
+  <div class="success-page__container">
+    <app-navigation
+      [backButtonText]="getText('identity.common.backButton')"
+      (backClick)="goBack()"
+    ></app-navigation>
+
+    <div class="success-page__content">
+      <div class="success-page__icon">
+        <div class="success-page__icon__person">
+          <div class="success-page__icon__person__head"></div>
+          <div class="success-page__icon__person__body"></div>
+        </div>
+        <div class="success-page__icon__checkmark">✓</div>
+      </div>
+
+      <app-title-section
+        [titlePrefix]="getText('identity.success.title')"
+        [subtitle]="getText('identity.success.subtitle')"
+      ></app-title-section>
+    </div>
+
+    <div class="success-page__actions">
+      <button class="success-page__home-btn" (click)="goHome()">
+        Ir al inicio
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+<div class="title-section">
+  <h1 class="title-section__title">
+    <span class="title-section__title__prefix">{{ titlePrefix }}</span>
+    <span class="title-section__title__highlight">{{ titleHighlight }}</span>
+    @if (showSuccessIcon) {
+    <span class="title-section__title__icon">{{ successIcon }}</span>
+    }
+  </h1>
+  @if (subtitle) {
+  <p class="title-section__subtitle">
+    {{ subtitle }}
+  </p>
+  }
+</div>

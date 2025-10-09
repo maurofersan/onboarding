@@ -1,0 +1,44 @@
+.onboarding-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+
+  &__container {
+    max-width: 25rem;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+  }
+
+  &__actions {
+    margin-top: 2rem;
+  }
+
+  &__continue-btn {
+    width: 100%;
+    background-color: #dc3545;
+    color: #ffffff;
+    border: none;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: #c82333;
+      transform: translateY(-0.0625rem);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+}

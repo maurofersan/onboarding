@@ -1,10 +1,15 @@
 import { Routes } from '@angular/router';
 
-import { ONBOARDING_ROUTES } from './features/onboarding.routes';
+import { IDENTITY_ROUTES } from './features/identity.routes';
 
 export const routes: Routes = [
   {
+    path: 'biometria',
+    children: IDENTITY_ROUTES,
+  },
+  {
     path: '',
-    children: ONBOARDING_ROUTES,
+    redirectTo: 'biometria',
+    pathMatch: 'full',
   },
 ];

@@ -1,0 +1,147 @@
+.camera {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+
+  &__container {
+    position: relative;
+    width: 100%;
+    max-width: 25rem;
+    aspect-ratio: 4/3;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background-color: #000000;
+  }
+
+  &__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); // Mirror for selfie
+    background-color: #000000;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    border-radius: 0.75rem;
+
+    &--active {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+
+    &--dni-front,
+    &--dni-back {
+      .camera__overlay__frame {
+        width: 20rem;
+        height: 12.5rem;
+        border: 0.1875rem solid #ffffff;
+        border-radius: 0.75rem;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+        position: relative;
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: -0.125rem;
+          left: -0.125rem;
+          right: -0.125rem;
+          bottom: -0.125rem;
+          border: 0.125rem solid #dc3545;
+          border-radius: 0.875rem;
+          z-index: 1;
+        }
+      }
+    }
+
+    &--selfie {
+      .camera__overlay__frame {
+        width: 12.5rem;
+        height: 12.5rem;
+        border: 0.1875rem solid #ffffff;
+        border-radius: 50%;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+        position: relative;
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: -0.125rem;
+          left: -0.125rem;
+          right: -0.125rem;
+          bottom: -0.125rem;
+          border: 0.125rem solid #dc3545;
+          border-radius: 50%;
+          z-index: 1;
+        }
+      }
+    }
+
+    &__frame {
+      position: relative;
+      z-index: 1;
+    }
+  }
+
+  &__controls {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+
+  &__capture-btn {
+    width: 3.75rem;
+    height: 3.75rem;
+    border-radius: 50%;
+    border: 0.1875rem solid #ffffff;
+    background-color: #dc3545;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: #c82333;
+      transform: scale(1.05);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &__icon {
+      font-size: 1.5rem;
+    }
+  }
+
+  &__instruction {
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-align: center;
+    margin: 0;
+    max-width: 18.75rem;
+  }
+
+  &__canvas {
+    display: none;
+  }
+}

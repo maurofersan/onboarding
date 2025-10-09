@@ -1,0 +1,15 @@
+<div class="consent">
+  <label class="consent__label">
+    <input
+      type="checkbox"
+      class="consent__checkbox"
+      [checked]="checked"
+      (change)="onConsentChange($event)"
+    />
+    <span class="consent__text">
+      {{ textPrefix }}
+      <span class="consent__text__highlight">{{ textHighlight }}</span>
+      {{ textSuffix }}
+    </span>
+  </label>
+</div>

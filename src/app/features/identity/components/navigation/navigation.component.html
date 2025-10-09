@@ -1,0 +1,10 @@
+<nav class="navigation">
+  <button
+    class="navigation__back-btn"
+    (click)="onBackClick()"
+    [disabled]="disabled"
+  >
+    <span class="navigation__back-btn__icon">←</span>
+    <span class="navigation__back-btn__text">{{ backButtonText }}</span>
+  </button>
+</nav>

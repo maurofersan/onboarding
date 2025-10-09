@@ -1,0 +1,38 @@
+.navigation {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+
+  &__back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    transition: color 0.2s ease;
+
+    &:hover:not(:disabled) {
+      color: #495057;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &__icon {
+      font-size: 1.125rem;
+      font-weight: bold;
+    }
+
+    &__text {
+      font-size: 1rem;
+    }
+  }
+}

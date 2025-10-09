@@ -1,0 +1,34 @@
+<div class="camera">
+  <div class="camera__container">
+    <video
+      #videoElement
+      class="camera__video"
+      autoplay
+      playsinline
+      muted
+      webkit-playsinline
+      [class.camera__video--active]="isActive"
+      preload="none"
+    ></video>
+
+    <div class="camera__overlay" [class]="'camera__overlay ' + overlayClass">
+      <div class="camera__overlay__frame"></div>
+    </div>
+
+    @if (isActive) {
+    <div class="camera__controls">
+      <button
+        class="camera__capture-btn"
+        (click)="captureImage()"
+        [disabled]="isCapturing"
+      >
+        <span class="camera__capture-btn__icon">📷</span>
+      </button>
+    </div>
+    }
+  </div>
+
+  <p class="camera__instruction">{{ instructionText }}</p>
+
+  <canvas #canvasElement class="camera__canvas" style="display: none"></canvas>
+</div>

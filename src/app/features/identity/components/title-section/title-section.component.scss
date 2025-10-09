@@ -1,0 +1,36 @@
+.title-section {
+  margin-bottom: 2rem;
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+
+    &__prefix {
+      color: #212529;
+    }
+
+    &__highlight {
+      color: #dc3545;
+    }
+
+    &__icon {
+      color: #28a745;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+  }
+
+  &__subtitle {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #6c757d;
+    margin: 0;
+    line-height: 1.5;
+  }
+}

@@ -1,0 +1,18 @@
+<div class="instructions">
+  <div class="instructions__card">
+    @for (instruction of instructions; track instruction; let last = $last) {
+    <div class="instructions__item">
+      <div class="instructions__item__icon">
+        <img
+          [src]="getIconPath(instruction.iconKey)"
+          [alt]="instruction.text"
+          class="instructions__item__icon__image"
+        />
+      </div>
+      <div class="instructions__item__text">
+        {{ instruction.text }}
+      </div>
+    </div>
+    }
+  </div>
+</div>

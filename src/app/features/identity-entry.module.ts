@@ -1,24 +1,24 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { OnboardingEntryComponent } from './onboarding-entry.component';
+import { IdentityEntryComponent } from './identity-entry.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: OnboardingEntryComponent,
+    component: IdentityEntryComponent,
     children: [
       {
         path: '',
         loadChildren: () =>
-          import('./onboarding.routes').then((m) => m.ONBOARDING_ROUTES),
+          import('./identity.routes').then((m) => m.IDENTITY_ROUTES),
       },
     ],
   },
 ];
 
 @NgModule({
-  declarations: [OnboardingEntryComponent],
+  declarations: [IdentityEntryComponent],
   imports: [RouterModule.forChild(routes)],
 })
-export class OnboardingEntryModule {}
+export class IdentityEntryModule {}

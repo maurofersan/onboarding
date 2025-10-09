@@ -1,0 +1,40 @@
+<div class="dni-back-page">
+  <div class="dni-back-page__container">
+    <app-navigation
+      [backButtonText]="getText('identity.common.backButton')"
+      (backClick)="goBack()"
+    ></app-navigation>
+
+    <app-title-section
+      [titlePrefix]="getText('identity.dni-reverso.title.prefix')"
+      [titleHighlight]="getText('identity.dni-reverso.title.highlight')"
+      [subtitle]="getText('identity.dni-reverso.subtitle')"
+      [showSuccessIcon]="isCaptured"
+      [successIcon]="getText('identity.dni-reverso.success.icon')"
+    ></app-title-section>
+
+    <div class="dni-back-page__camera-container">
+      <app-camera
+        type="dni-back"
+        [isActive]="isCameraActive && !isCaptured"
+        (imageCaptured)="onImageCaptured($event)"
+        (cameraError)="onCameraError($event)"
+      ></app-camera>
+    </div>
+
+    @if (errorMessage) {
+    <div class="dni-back-page__error">
+      <p class="dni-back-page__error__message">{{ errorMessage }}</p>
+      <button class="dni-back-page__error__retry" (click)="retryCapture()">
+        {{ getText('identity.common.retry') }}
+      </button>
+      <button
+        class="dni-back-page__error__permissions"
+        (click)="requestPermissions()"
+      >
+        Solicitar Permisos de Cámara
+      </button>
+    </div>
+    }
+  </div>
+</div>

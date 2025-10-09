@@ -1,0 +1,83 @@
+{
+  "identity": {
+    "onboarding": {
+      "title": {
+        "prefix": "Ahora validemos tu",
+        "highlight": "identidad"
+      },
+      "subtitle": "Te pediremos fotos de tu DNI y una selfie",
+      "instructions": {
+        "dni": "Ten tu DNI a la mano",
+        "camera": "Permite el acceso a la cámara de tu celular",
+        "lighting": "Asegúrate de estar en un ambiente iluminado"
+      },
+      "consent": {
+        "text": "Autorizo el almacenamiento de mis",
+        "highlight": "datos biométricos para verificar mi identidad",
+        "suffix": "(Opcional)"
+      },
+      "continueButton": "Continuar"
+    },
+    "dni-frente": {
+      "title": {
+        "prefix": "Enfoca el",
+        "highlight": "frente"
+      },
+      "subtitle": "de tu DNI",
+      "instruction": "Por favor, mantén la posición",
+      "success": {
+        "title": "Foto realizada",
+        "icon": "✓"
+      }
+    },
+    "dni-reverso": {
+      "title": {
+        "prefix": "Enfoca el",
+        "highlight": "reverso"
+      },
+      "subtitle": "de tu DNI",
+      "instruction": "Por favor, mantén la posición",
+      "success": {
+        "title": "Foto realizada",
+        "icon": "✓"
+      }
+    },
+    "selfie": {
+      "title": {
+        "prefix": "Ahora, una",
+        "highlight": "selfie"
+      },
+      "instruction": "Ubica tu rostro al centro y espera a que la cámara te enfoque",
+      "success": {
+        "title": "Foto realizada",
+        "icon": "✓"
+      }
+    },
+    "success": {
+      "title": "Validamos tu identidad",
+      "subtitle": "con éxito",
+      "icon": "✓"
+    },
+    "common": {
+      "backButton": "Volver",
+      "loading": "Cargando...",
+      "error": "Ha ocurrido un error",
+      "retry": "Intentar de nuevo",
+      "camera": {
+        "accessDenied": "Acceso a la cámara denegado",
+        "notAvailable": "Cámara no disponible",
+        "permissionRequired": "Se requiere permiso para acceder a la cámara",
+        "active": "Cámara activa",
+        "inactive": "Cámara inactiva"
+      },
+      "validation": {
+        "imageTooBlurry": "La imagen está muy borrosa",
+        "imageTooDark": "La imagen está muy oscura",
+        "imageTooBright": "La imagen está muy brillante",
+        "faceNotDetected": "No se detectó un rostro",
+        "dniNotDetected": "No se detectó el DNI",
+        "dniNotAligned": "El DNI no está bien alineado"
+      }
+    }
+  }
+}
