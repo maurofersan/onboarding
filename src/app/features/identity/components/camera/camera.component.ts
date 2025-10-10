@@ -11,10 +11,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   SimpleChanges,
 } from '@angular/core';
-import {
-  CameraType,
-  CameraConstraints,
-} from '../../../../shared/interfaces/identity.interfaces';
+import { CameraType } from '../../../../shared/interfaces/identity.interfaces';
 
 @Component({
   selector: 'app-camera',
@@ -37,6 +34,7 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
 
   private stream: MediaStream | null = null;
   isCapturing = false;
+  isCaptured = false;
 
   ngOnInit(): void {
     // Initialize camera if isActive is already true
@@ -55,8 +53,6 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
           setTimeout(() => {
             this.initializeCamera();
           }, 0);
-        } else {
-          this.stopCamera();
         }
       }
     }
@@ -68,7 +64,6 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
 
   /**
    * Sets up video element properties for optimal mobile display
-   * Following SOLID SRP - single responsibility for video setup
    */
   private setupVideoElement(video: HTMLVideoElement): void {
     // Clear any existing srcObject first
@@ -92,15 +87,6 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
     video.setAttribute('x5-video-player-type', 'h5');
     video.setAttribute('x5-video-player-fullscreen', 'true');
     // }
-
-    // Log video element properties for debugging
-    console.log('Video element setup:', {
-      muted: video.muted,
-      autoplay: video.autoplay,
-      playsInline: video.playsInline,
-      preload: video.preload,
-      controls: video.controls,
-    });
   }
 
   /**
@@ -117,7 +103,6 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
 
     for (const mimeType of mimeTypes) {
       if (MediaRecorder.isTypeSupported(mimeType)) {
-        console.log('Supported MIME type:', mimeType);
         return mimeType;
       }
     }
@@ -151,15 +136,6 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
   private setupVideoEventHandlers(video: HTMLVideoElement): void {
     // Wait for video to be ready
     video.onloadedmetadata = () => {
-      console.log(
-        'Video metadata loaded, dimensions:',
-        video.videoWidth,
-        'x',
-        video.videoHeight
-      );
-      console.log('Video srcObject:', video.srcObject);
-      console.log('Video readyState:', video.readyState);
-
       // Force play immediately after metadata loads
       video
         .play()
@@ -236,27 +212,15 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
 
       // Check if we're in a secure context (HTTPS or localhost)
       if (!window.isSecureContext) {
-        console.log('window.isSecureContext::', window.isSecureContext);
         throw new Error('Camera access requires HTTPS or localhost');
       }
 
       const constraints = this.getCameraConstraints();
 
-      console.log('Requesting camera access with constraints:', constraints);
-
       try {
         // Request camera permission
         this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-        console.log(
-          'Camera access granted with MIME type, stream:',
-          this.stream
-        );
       } catch (mimeError) {
-        console.log(
-          'Failed with MIME type, trying fallback constraints:',
-          mimeError
-        );
-
         // Try with fallback constraints (without MIME type)
         const fallbackConstraints = this.getFallbackConstraints();
         console.log('Trying fallback constraints:', fallbackConstraints);
@@ -264,16 +228,10 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
         this.stream = await navigator.mediaDevices.getUserMedia(
           fallbackConstraints
         );
-        console.log(
-          'Camera access granted with fallback, stream:',
-          this.stream
-        );
       }
 
       if (this.videoElement && this.stream) {
         const video = this.videoElement.nativeElement;
-        console.log('video::', video);
-        console.log('this.stream::', this.stream);
 
         // Setup video element properties first
         this.setupVideoElement(video);
@@ -356,6 +314,7 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
 
       if (isValid) {
         this.imageCaptured.emit(imageData);
+        this.isCaptured = true;
       } else {
         this.cameraError.emit(
           'La imagen no cumple con los requisitos de calidad'
@@ -371,7 +330,6 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
 
   /**
    * Gets camera constraints optimized for mobile devices
-   * Following SOLID SRP - single responsibility for constraint configuration
    */
   private getCameraConstraints(): MediaStreamConstraints {
     const isSelfie = this.type === 'selfie';
@@ -416,7 +374,7 @@ export class CameraComponent implements OnInit, OnDestroy, OnChanges {
         const isGoodSize = img.width >= 800 && img.height >= 600;
         const isGoodAspectRatio =
           this.type === 'selfie'
-            ? Math.abs(img.width / img.height - 1) < 0.2 // Square-ish for selfie
+            ? Math.abs(img.width / img.height - 1) < 2.2 // 0.2 Square-ish for selfie
             : Math.abs(img.width / img.height - 1.6) < 0.2; // DNI aspect ratio
 
         resolve(isGoodSize && isGoodAspectRatio);

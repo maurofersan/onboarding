@@ -1,11 +1,15 @@
 <div class="title-section">
   <h1 class="title-section__title">
+    @if (!showSuccess) {
     <span class="title-section__title__prefix">{{ titlePrefix }}</span>
     <span class="title-section__title__highlight">{{ titleHighlight }}</span>
     @if (titleSufix) {
     <span class="title-section__title__sufix">{{ titleSufix }}</span>
-    } @if (showSuccessIcon) {
-    <span class="title-section__title__icon">{{ successIcon }}</span>
+    } }@else {
+    <span class="title-section__title__success"
+      >{{ successTitle }}
+      <img src="assets/images/success-check.svg" alt="success check" />
+    </span>
     }
   </h1>
   @if (subtitle) {

@@ -12,6 +12,6 @@ export class TitleSectionComponent {
   @Input() titleHighlight: string = '';
   @Input() titleSufix?: string = '';
   @Input() subtitle?: string = '';
-  @Input() showSuccessIcon: boolean = false;
-  @Input() successIcon: string = '✓';
+  @Input() showSuccess: boolean = false;
+  @Input() successTitle: string = '';
 }

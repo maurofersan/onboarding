@@ -13,17 +13,20 @@
 
     &__prefix,
     &__sufix {
-      color: #212529;
+      color: #222222;
     }
 
     &__highlight {
       color: #dc3545;
     }
 
-    &__icon {
-      color: #28a745;
+    &__success {
+      color: #008035;
       font-size: 1.5rem;
       font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
   }
 

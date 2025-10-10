@@ -3,9 +3,21 @@
     class="camera__container"
     [class.camera__container--selfie]="type === 'selfie'"
   >
+    <!-- SVG Border for selfie only -->
+    @if (type === 'selfie') {
+    <div class="camera__container__svg-border">
+      <img
+        src="assets/images/selfie-frame.svg"
+        alt="Selfie frame"
+        class="camera__container__svg-border__image"
+      />
+    </div>
+    }
+
     <video
       #videoElement
       class="camera__video"
+      [class.camera__video--selfie]="type === 'selfie'"
       autoplay
       playsinline
       muted
@@ -14,13 +26,17 @@
       [style.transform]="type === 'selfie' ? 'scaleX(-1)' : 'none'"
       preload="none"
     ></video>
-    <!-- controls="false" -->
 
     <!-- <div class="camera__overlay" [class]="'camera__overlay ' + overlayClass">
       <div class="camera__overlay__frame"></div>
     </div> -->
 
-    @if (isActive) {
+    @if (isCaptured) {
+    <div
+      class="camera__overlay-success"
+      [class.camera__overlay-success--selfie]="type === 'selfie'"
+    ></div>
+    } @if (isActive) {
     <div class="camera__controls">
       <button
         class="camera__capture-btn"

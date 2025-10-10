@@ -26,8 +26,7 @@
       },
       "instruction": "Por favor, mantén la posición",
       "success": {
-        "title": "Foto realizada",
-        "icon": "✓"
+        "title": "Foto realizada"
       }
     },
     "dni-back": {
@@ -38,8 +37,7 @@
       },
       "instruction": "Por favor, mantén la posición",
       "success": {
-        "title": "Foto realizada",
-        "icon": "✓"
+        "title": "Foto realizada"
       }
     },
     "selfie": {
@@ -49,14 +47,11 @@
       },
       "instruction": "Ubica tu rostro al centro y espera a que la cámara te enfoque",
       "success": {
-        "title": "Foto realizada",
-        "icon": "✓"
+        "title": "Foto realizada"
       }
     },
     "success": {
-      "title": "Validamos tu identidad",
-      "subtitle": "con éxito",
-      "icon": "✓"
+      "title": "Validamos tu identidad con éxito"
     },
     "common": {
       "backButton": "Volver",

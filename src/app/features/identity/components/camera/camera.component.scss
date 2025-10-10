@@ -1,3 +1,8 @@
+$selfie-border-spacing: 1.5rem;
+$selfie-video-padding: 1.5rem;
+$selfie-controls-bottom: 0.5rem;
+$default-controls-bottom: 1.25rem;
+
 .camera {
   display: flex;
   flex-direction: column;
@@ -12,37 +17,41 @@
     border-radius: 0.75rem;
     overflow: hidden;
     background-color: #000000;
+
+    // Selfie specific styles
+    &--selfie {
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      overflow: visible; // Allow SVG border to be visible
+      background-color: transparent;
+      padding: 0;
+    }
   }
 
-  &__container--selfie {
-    aspect-ratio: 1 / 1;
-    border-radius: 50%;
-    overflow: hidden;
-    position: relative;
+  // SVG Border for selfie
+  &__container__svg-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-    background-color: white;
-    padding: 10px;
-    box-sizing: border-box;
-    border: 6px dashed #8f8f8f;
-
-    // &::before {
-    //   content: "";
-    //   position: absolute;
-    //   inset: 10px;
-    //   background-image: url("/assets/images/selfie-frame.svg");
-    //   background-size: cover;
-    //   background-repeat: no-repeat;
-    //   background-position: center;
-    //   pointer-events: none;
-    //   z-index: 2;
-    // }
+    &__image {
+      width: 250px;
+      height: 250px;
+      object-fit: contain;
+    }
   }
 
   &__video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    // background-color: #000000;
     display: block;
     position: absolute;
     top: 0;
@@ -53,6 +62,43 @@
     &--active {
       opacity: 1;
       visibility: visible;
+    }
+
+    // Selfie specific video styles
+    &--selfie {
+      border-radius: 50%;
+      // Add padding to create space between video and SVG border
+      padding: $selfie-video-padding;
+      box-sizing: border-box;
+      // Ensure video doesn't overflow the circular container
+      width: calc(100% - #{$selfie-border-spacing * 2});
+      height: calc(100% - #{$selfie-border-spacing * 2});
+      top: $selfie-border-spacing;
+      left: $selfie-border-spacing;
+    }
+  }
+
+  &__overlay-success {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 128, 53, 0.4);
+    border-radius: 1rem;
+    pointer-events: none;
+    z-index: 2;
+
+    &--selfie {
+      border-radius: 50%;
+      // Add padding to create space between video and SVG border
+      padding: $selfie-video-padding;
+      box-sizing: border-box;
+      // Ensure video doesn't overflow the circular container
+      width: calc(100% - #{$selfie-border-spacing * 2});
+      height: calc(100% - #{$selfie-border-spacing * 2});
+      top: $selfie-border-spacing;
+      left: $selfie-border-spacing;
     }
   }
 
@@ -67,6 +113,7 @@
     justify-content: center;
     pointer-events: none;
 
+    // DNI specific overlay styles
     &--dni-front,
     &--dni-back {
       .camera__overlay__frame {
@@ -74,7 +121,6 @@
         height: 12.5rem;
         border: 0.1875rem solid #ffffff;
         border-radius: 0.75rem;
-        // box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
         position: relative;
 
         &::before {
@@ -91,27 +137,9 @@
       }
     }
 
+    // Selfie overlay is handled by SVG border, so we hide this
     &--selfie {
-      .camera__overlay__frame {
-        width: 12.5rem;
-        height: 12.5rem;
-        border: 0.1875rem solid #ffffff;
-        border-radius: 50%;
-        // box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
-        position: relative;
-
-        &::before {
-          content: "";
-          position: absolute;
-          top: -0.125rem;
-          left: -0.125rem;
-          right: -0.125rem;
-          bottom: -0.125rem;
-          border: 0.125rem solid #dc3545;
-          border-radius: 50%;
-          z-index: 1;
-        }
-      }
+      display: none;
     }
 
     &__frame {
@@ -122,10 +150,15 @@
 
   &__controls {
     position: absolute;
-    bottom: 1.25rem;
+    bottom: $default-controls-bottom;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 2;
+    z-index: 3; // Higher than SVG border
+
+    // Selfie specific controls positioning
+    .camera__container--selfie & {
+      bottom: $selfie-controls-bottom;
+    }
   }
 
   &__capture-btn {

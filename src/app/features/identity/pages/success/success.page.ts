@@ -7,7 +7,6 @@ import {
 import { Router } from '@angular/router';
 import { BaseComponent } from '../../../../shared/base/base.component';
 import { TextService } from '../../../../core/services/text.service';
-import { IdentityStoreService } from '../../../../core/services/identity-store.service';
 import { NavigationComponent } from '../../components/navigation/navigation.component';
 import { TitleSectionComponent } from '../../components/title-section/title-section.component';
 
@@ -21,16 +20,10 @@ import { TitleSectionComponent } from '../../components/title-section/title-sect
 })
 export class SuccessPageComponent extends BaseComponent implements OnInit {
   private textService = inject(TextService);
-  private identityStore = inject(IdentityStoreService);
   private router = inject(Router);
 
   ngOnInit(): void {
     this.textService.loadTexts('es').subscribe();
-
-    // Navigate to home after 3 seconds
-    setTimeout(() => {
-      this.router.navigate(['/']);
-    }, 3000);
   }
 
   /**
@@ -38,19 +31,5 @@ export class SuccessPageComponent extends BaseComponent implements OnInit {
    */
   getText(key: string, params?: { [key: string]: string | number }): string {
     return this.textService.getText(key, params);
-  }
-
-  /**
-   * Navigates back to previous page
-   */
-  goBack(): void {
-    this.router.navigate(['/biometria/selfie']);
-  }
-
-  /**
-   * Navigates to home
-   */
-  goHome(): void {
-    this.router.navigate(['/']);
   }
 }
