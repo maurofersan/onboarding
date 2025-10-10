@@ -24,13 +24,11 @@
     </main>
 
     <div class="onboarding-page__actions">
-      <button
+      <std-button
         class="onboarding-page__continue-btn"
         (click)="continue()"
-        [disabled]="!biometricConsent"
-      >
-        {{ continueButton() }}
-      </button>
+        [label]="continueButton()"
+      />
     </div>
   </div>
 </div>
