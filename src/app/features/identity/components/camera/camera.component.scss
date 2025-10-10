@@ -42,8 +42,8 @@ $default-controls-bottom: 1.25rem;
     align-items: center;
 
     &__image {
-      width: 250px;
-      height: 250px;
+      width: calc(100% - $selfie-border-spacing);
+      height: calc(100% - $selfie-border-spacing);
       object-fit: contain;
     }
   }
@@ -68,7 +68,7 @@ $default-controls-bottom: 1.25rem;
     &--selfie {
       border-radius: 50%;
       // Add padding to create space between video and SVG border
-      padding: $selfie-video-padding;
+      // padding: $selfie-video-padding;
       box-sizing: border-box;
       // Ensure video doesn't overflow the circular container
       width: calc(100% - #{$selfie-border-spacing * 2});
@@ -90,11 +90,11 @@ $default-controls-bottom: 1.25rem;
     z-index: 2;
 
     &--selfie {
+      // Match exactly the video circular area
       border-radius: 50%;
-      // Add padding to create space between video and SVG border
-      padding: $selfie-video-padding;
+      // Use the same positioning and sizing as the selfie video
+      // padding: $selfie-video-padding;
       box-sizing: border-box;
-      // Ensure video doesn't overflow the circular container
       width: calc(100% - #{$selfie-border-spacing * 2});
       height: calc(100% - #{$selfie-border-spacing * 2});
       top: $selfie-border-spacing;
