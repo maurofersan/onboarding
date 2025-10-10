@@ -1,17 +1,17 @@
 <div class="dni-front-page">
   <div class="dni-front-page__container">
     <app-navigation
-      [backButtonText]="getText('identity.common.backButton')"
+      [backButtonText]="backButton()"
       (backClick)="goBack()"
     ></app-navigation>
 
     <main class="dni-front-page__main">
       <app-title-section
-        [titlePrefix]="getText('identity.dni-front.title.prefix')"
-        [titleHighlight]="getText('identity.dni-front.title.highlight')"
-        [titleSufix]="getText('identity.dni-front.title.suffix')"
+        [titlePrefix]="titlePrefix()"
+        [titleHighlight]="titleHighlight()"
+        [titleSufix]="titleSuffix()"
         [showSuccess]="isCaptured"
-        [successTitle]="getText('identity.dni-front.success.title')"
+        [successTitle]="successTitle()"
       ></app-title-section>
 
       <div class="dni-front-page__camera-container">
@@ -28,7 +28,7 @@
     <div class="dni-front-page__error">
       <p class="dni-front-page__error__message">{{ errorMessage }}</p>
       <button class="dni-front-page__error__retry" (click)="retryCapture()">
-        {{ getText('identity.common.retry') }}
+        {{ retryButton() }}
       </button>
       <button
         class="dni-front-page__error__permissions"

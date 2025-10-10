@@ -1,23 +1,23 @@
 <div class="onboarding-page">
   <div class="onboarding-page__container">
     <app-navigation
-      [backButtonText]="getText('identity.common.backButton')"
+      [backButtonText]="backButton()"
       (backClick)="goBack()"
     ></app-navigation>
 
     <main class="onboarding-page__main">
       <app-title-section
-        [titlePrefix]="getText('identity.onboarding.title.prefix')"
-        [titleHighlight]="getText('identity.onboarding.title.highlight')"
-        [subtitle]="getText('identity.onboarding.subtitle')"
+        [titlePrefix]="titlePrefix()"
+        [titleHighlight]="titleHighlight()"
+        [subtitle]="subtitle()"
       ></app-title-section>
 
-      <app-instructions [instructions]="instructions"></app-instructions>
+      <app-instructions [instructions]="instructions()"></app-instructions>
 
       <app-consent
-        [textPrefix]="getText('identity.onboarding.consent.text')"
-        [textHighlight]="getText('identity.onboarding.consent.highlight')"
-        [textSuffix]="getText('identity.onboarding.consent.suffix')"
+        [textPrefix]="consentText()"
+        [textHighlight]="consentHighlight()"
+        [textSuffix]="consentSuffix()"
         [checked]="biometricConsent"
         (consentChange)="onConsentChange($event)"
       ></app-consent>
@@ -29,7 +29,7 @@
         (click)="continue()"
         [disabled]="!biometricConsent"
       >
-        {{ getText('identity.onboarding.continueButton') }}
+        {{ continueButton() }}
       </button>
     </div>
   </div>

@@ -263,3 +263,4 @@ Todos los componentes siguen la metodología BEM (Block Element Modifier):
 - Se aplicó metodología BEM para todos los estilos
 - Se implementó manejo de estado con Angular Signals
 - Se siguieron las mejores prácticas de Angular standalone components
+

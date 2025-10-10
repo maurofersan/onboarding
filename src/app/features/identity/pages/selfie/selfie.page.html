@@ -1,16 +1,16 @@
 <div class="selfie-page">
   <div class="selfie-page__container">
     <app-navigation
-      [backButtonText]="getText('identity.common.backButton')"
+      [backButtonText]="backButton()"
       (backClick)="goBack()"
     ></app-navigation>
 
     <main class="selfie-page__main">
       <app-title-section
-        [titlePrefix]="getText('identity.selfie.title.prefix')"
-        [titleHighlight]="getText('identity.selfie.title.highlight')"
+        [titlePrefix]="titlePrefix()"
+        [titleHighlight]="titleHighlight()"
         [showSuccess]="isCaptured"
-        [successTitle]="getText('identity.selfie.success.title')"
+        [successTitle]="successTitle()"
       ></app-title-section>
 
       <div class="selfie-page__camera-container">
@@ -27,7 +27,7 @@
     <div class="selfie-page__error">
       <p class="selfie-page__error__message">{{ errorMessage }}</p>
       <button class="selfie-page__error__retry" (click)="retryCapture()">
-        {{ getText('identity.common.retry') }}
+        {{ retryButton() }}
       </button>
       <button
         class="selfie-page__error__permissions"

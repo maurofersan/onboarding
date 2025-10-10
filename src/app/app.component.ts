@@ -1,5 +1,11 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TextService } from './core/services/text.service';
 
 @Component({
   selector: 'app-root',
@@ -9,6 +15,12 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+  private readonly textService = inject(TextService);
+
   title = 'identity';
+
+  async ngOnInit(): Promise<void> {
+    await this.textService.loadTexts();
+  }
 }

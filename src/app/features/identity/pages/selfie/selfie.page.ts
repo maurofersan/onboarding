@@ -4,6 +4,7 @@ import {
   OnInit,
   OnDestroy,
   inject,
+  computed,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { BaseComponent } from '../../../../shared/base/base.component';
@@ -29,12 +30,27 @@ export class SelfiePageComponent
   isCaptured = false;
   errorMessage = '';
 
-  private textService = inject(TextService);
-  private identityStore = inject(IdentityStoreService);
-  private router = inject(Router);
+  private readonly textService = inject(TextService);
+  private readonly identityStore = inject(IdentityStoreService);
+  private readonly router = inject(Router);
+
+  readonly titlePrefix = this.textService.getTextSignal(
+    'identity.selfie.title.prefix'
+  );
+  readonly titleHighlight = this.textService.getTextSignal(
+    'identity.selfie.title.highlight'
+  );
+  readonly successTitle = this.textService.getTextSignal(
+    'identity.selfie.success.title'
+  );
+  readonly backButton = this.textService.getTextSignal(
+    'identity.common.backButton'
+  );
+  readonly retryButton = this.textService.getTextSignal(
+    'identity.common.retry'
+  );
 
   ngOnInit(): void {
-    this.textService.loadTexts('es').subscribe();
     // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
     setTimeout(() => {
       this.initializeCamera();
@@ -44,13 +60,6 @@ export class SelfiePageComponent
   override ngOnDestroy(): void {
     this.isCameraActive = false;
     super.ngOnDestroy();
-  }
-
-  /**
-   * Gets text by key with fallback support
-   */
-  getText(key: string, params?: { [key: string]: string | number }): string {
-    return this.textService.getText(key, params);
   }
 
   /**

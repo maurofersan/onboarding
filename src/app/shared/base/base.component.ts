@@ -10,3 +10,4 @@ export abstract class BaseComponent implements OnDestroy {
     this.destroy$.complete();
   }
 }
+

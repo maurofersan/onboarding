@@ -75,3 +75,4 @@ export class IdentityStoreService {
       this.isSelfieComplete()
   );
 }
+

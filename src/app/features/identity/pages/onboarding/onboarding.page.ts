@@ -3,6 +3,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   OnInit,
   inject,
+  computed,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { BaseComponent } from '../../../../shared/base/base.component';
@@ -30,40 +31,54 @@ import { InstructionItem } from '../../../../shared/interfaces/identity.interfac
 export class OnboardingPageComponent extends BaseComponent implements OnInit {
   biometricConsent = false;
 
-  private textService = inject(TextService);
-  private identityStore = inject(IdentityStoreService);
-  private router = inject(Router);
+  private readonly textService = inject(TextService);
+  private readonly identityStore = inject(IdentityStoreService);
+  private readonly router = inject(Router);
 
-  ngOnInit(): void {
-    this.textService.loadTexts('es').subscribe();
-  }
+  readonly titlePrefix = this.textService.getTextSignal(
+    'identity.onboarding.title.prefix'
+  );
+  readonly titleHighlight = this.textService.getTextSignal(
+    'identity.onboarding.title.highlight'
+  );
+  readonly subtitle = this.textService.getTextSignal(
+    'identity.onboarding.subtitle'
+  );
+  readonly continueButton = this.textService.getTextSignal(
+    'identity.onboarding.continueButton'
+  );
+  readonly backButton = this.textService.getTextSignal(
+    'identity.common.backButton'
+  );
 
-  /**
-   * Gets text by key with fallback support
-   */
-  getText(key: string, params?: { [key: string]: string | number }): string {
-    return this.textService.getText(key, params);
-  }
+  readonly consentText = this.textService.getTextSignal(
+    'identity.onboarding.consent.text'
+  );
+  readonly consentHighlight = this.textService.getTextSignal(
+    'identity.onboarding.consent.highlight'
+  );
+  readonly consentSuffix = this.textService.getTextSignal(
+    'identity.onboarding.consent.suffix'
+  );
 
-  /**
-   * Gets instruction items for the onboarding
-   */
-  get instructions(): InstructionItem[] {
-    return [
-      {
-        iconKey: 'dni',
-        text: this.getText('identity.onboarding.instructions.dni'),
-      },
-      {
-        iconKey: 'camera',
-        text: this.getText('identity.onboarding.instructions.camera'),
-      },
-      {
-        iconKey: 'lighting',
-        text: this.getText('identity.onboarding.instructions.lighting'),
-      },
-    ];
-  }
+  readonly instructions = computed<InstructionItem[]>(() => [
+    {
+      iconKey: 'dni',
+      text: this.textService.getText('identity.onboarding.instructions.dni'),
+    },
+    {
+      iconKey: 'camera',
+      text: this.textService.getText('identity.onboarding.instructions.camera'),
+    },
+    {
+      iconKey: 'lighting',
+      text: this.textService.getText(
+        'identity.onboarding.instructions.lighting'
+      ),
+    },
+  ]);
+
+  ngOnInit(): void {}
 
   /**
    * Handles biometric consent change
