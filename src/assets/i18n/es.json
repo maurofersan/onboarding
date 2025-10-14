@@ -1,4 +1,41 @@
 {
+  "accountOpening": {
+    "welcome": {
+      "title": {
+        "prefix": "Empecemos con",
+        "highlight": "tus datos"
+      },
+      "form": {
+        "dni": {
+          "label": "DNI",
+          "placeholder": "12345678",
+          "error": "El DNI debe tener 8 dígitos"
+        },
+        "phone": {
+          "label": "Celular",
+          "placeholder": "987654321",
+          "error": "El celular debe tener 9 dígitos"
+        },
+        "email": {
+          "label": "Correo electrónico",
+          "placeholder": "usuario@correo.com",
+          "error": "Ingresa un correo electrónico válido"
+        },
+        "taxDeclaration": {
+          "question": "Soy peruano/a de nacimiento, cuento con domicilio fiscal en Perú y solo tributo en Perú",
+          "no": "No",
+          "yes": "Sí"
+        },
+        "disclaimer": "Al hacer clic en \"Continuar\", declaras bajo juramento que esta información es verdadera y actualizada.",
+        "privacy": {
+          "text": "Acepto las",
+          "highlight": "políticas de privacidad",
+          "suffix": "y autorizo el uso de mis datos para recibir promociones y beneficios"
+        },
+        "continueButton": "Continuar"
+      }
+    }
+  },
   "identity": {
     "onboarding": {
       "title": {

@@ -1,0 +1,96 @@
+<div class="personal-data-page">
+  <div class="personal-data-page__container">
+    <!-- Title Section -->
+    <header class="personal-data-page__header">
+      <h1 class="personal-data-page__title">
+        <span class="personal-data-page__title__prefix">{{ titlePrefix() }}</span>
+        <span class="personal-data-page__title__highlight">{{ titleHighlight() }}</span>
+      </h1>
+    </header>
+
+    <!-- Form Section -->
+    <main class="personal-data-page__main">
+      <form class="personal-data-page__form" (ngSubmit)="onSubmit()">
+        <!-- DNI Field -->
+        <app-form-field
+          [config]="dniConfig"
+          [value]="formData().dni || ''"
+          [hasError]="hasFieldError('dni')()"
+          (valueChange)="updateField('dni', $event)"
+          (blur)="onDniBlur($event)"
+        />
+
+        <!-- Phone Field -->
+        <app-form-field
+          [config]="phoneConfig"
+          [value]="formData().phone || ''"
+          [hasError]="hasFieldError('phone')()"
+          (valueChange)="updateField('phone', $event)"
+        />
+
+        <!-- Email Field -->
+        <app-form-field
+          [config]="emailConfig"
+          [value]="formData().email || ''"
+          [hasError]="hasFieldError('email')()"
+          (valueChange)="updateField('email', $event)"
+        />
+
+        <!-- Tax Declaration Toggle -->
+        <div class="personal-data-page__field">
+          <app-tax-declaration-toggle
+            [value]="formData().taxDeclaration || false"
+            (valueChange)="onTaxDeclarationChange($event)"
+          />
+          <p class="personal-data-page__disclaimer">{{ disclaimer() }}</p>
+        </div>
+
+        <!-- Privacy Policy Checkbox -->
+        <div class="personal-data-page__field">
+          <label class="personal-data-page__checkbox">
+            <std-checkbox
+              [checked]="formData().privacyAccepted"
+              (stdChange)="onPrivacyChange($event)"
+            />
+            <span class="personal-data-page__checkbox__text">
+              {{ privacyText() }}
+              <span class="personal-data-page__checkbox__text__highlight">{{ privacyHighlight() }}</span>
+              {{ privacySuffix() }}
+            </span>
+          </label>
+        </div>
+
+        <!-- reCAPTCHA -->
+        <div class="personal-data-page__field">
+          <div class="personal-data-page__recaptcha">
+            <div class="personal-data-page__recaptcha__container">
+              <std-checkbox
+                [checked]="formData().recaptchaValid"
+                (stdChange)="onRecaptchaChange($event)"
+              />
+              <span class="personal-data-page__recaptcha__text">No soy un robot</span>
+              <div class="personal-data-page__recaptcha__branding">
+                <span class="personal-data-page__recaptcha__logo">reCAPTCHA</span>
+                <div class="personal-data-page__recaptcha__links">
+                  <a href="#" class="personal-data-page__recaptcha__link">Privacy</a>
+                  <span class="personal-data-page__recaptcha__separator">-</span>
+                  <a href="#" class="personal-data-page__recaptcha__link">Terms</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </main>
+
+    <!-- Actions Section -->
+    <footer class="personal-data-page__actions">
+      <std-button
+        class="personal-data-page__continue-btn"
+        [disabled]="!isFormValid()"
+        (click)="onSubmit()"
+        [label]="continueButton()"
+      />
+    </footer>
+  </div>
+</div>
