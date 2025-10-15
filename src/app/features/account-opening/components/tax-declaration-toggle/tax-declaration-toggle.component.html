@@ -1,15 +1,15 @@
 <div class="tax-declaration-toggle">
   <label class="tax-declaration-toggle__label">{{ question() }}</label>
   <div class="tax-declaration-toggle__options">
-    <std-button
+    <button
       *ngFor="let option of options()"
-      [variant]="value === option.value ? 'primary' : 'secondary'"
-      [size]="'medium'"
-      (click)="onOptionSelect(option.value)"
+      type="button"
       class="tax-declaration-toggle__option"
+      [class.tax-declaration-toggle__option--active]="value === option.value"
+      (click)="onOptionSelect(option.value)"
     >
       {{ option.label }}
-    </std-button>
+    </button>
   </div>
   <hr class="divider" />
 </div>
