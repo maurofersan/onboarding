@@ -40,8 +40,8 @@ export class TaxDeclarationToggleComponent {
   );
 
   readonly options = computed<TaxDeclarationOption[]>(() => [
-    { value: false, label: this.noLabel() },
     { value: true, label: this.yesLabel() },
+    { value: false, label: this.noLabel() },
   ]);
 
   onOptionSelect(optionValue: boolean): void {
