@@ -19,12 +19,13 @@ import {
 import { TaxDeclarationToggleComponent } from '../../../account-opening/components/tax-declaration-toggle/tax-declaration-toggle.component';
 import { FormFieldComponent } from '../../../account-opening/components/form-field/form-field.component';
 import { ErrorModalComponent } from './components/error-modal/error-modal.component';
+import { PrivacyModalComponent } from './components/privacy-modal/privacy-modal.component';
 import { FormFieldConfig } from '../../../account-opening/components/form-field/form-field.component';
 
 @Component({
   selector: 'app-personal-data',
   standalone: true,
-  imports: [TaxDeclarationToggleComponent, FormFieldComponent, ErrorModalComponent],
+  imports: [TaxDeclarationToggleComponent, FormFieldComponent, ErrorModalComponent, PrivacyModalComponent],
   templateUrl: './personal-data.component.html',
   styleUrl: './personal-data.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -47,8 +48,9 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
   // Errors state - empty by default, only show when user enters invalid data
   errors = signal<FormFieldError[]>([]);
 
-  // Modal state
+  // Modal states
   showModal = signal<boolean>(false);
+  showPrivacyModal = signal<boolean>(false);
 
   // Form field configurations
   readonly dniConfig: FormFieldConfig = {
@@ -359,6 +361,28 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    */
   closeModal(): void {
     this.showModal.set(false);
+  }
+
+  /**
+   * Opens the privacy modal
+   */
+  openPrivacyModal(): void {
+    this.showPrivacyModal.set(true);
+  }
+
+  /**
+   * Closes the privacy modal
+   */
+  closePrivacyModal(): void {
+    this.showPrivacyModal.set(false);
+  }
+
+  /**
+   * Handles privacy acceptance
+   */
+  acceptPrivacy(): void {
+    this.showPrivacyModal.set(false);
+    // Optionally, you can add logic here when user accepts privacy
   }
 
 

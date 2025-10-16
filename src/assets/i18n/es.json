@@ -31,7 +31,30 @@
           "text": "Acepto las",
           "highlight": "políticas de privacidad",
           "suffix": "y autorizo el uso de mis datos para recibir promociones y beneficios",
-          "error": "Debes aceptar las políticas de privacidad"
+          "error": "Debes aceptar las políticas de privacidad",
+          "modal": {
+            "title": "Políticas de Privacidad",
+            "content": {
+              "question": "¿Cómo tratamos tus datos personales para los fines comerciales y/o publicitarios?",
+              "intro": "A continuación, te informamos de forma directa y transparente cómo vamos a utilizar tu información personal para dar cumplimiento a las finalidades comerciales y/o publicitarias autorizadas:",
+              "point1": "SANTANDER CONSUMER BANK, con RUC N.º 20255993225, se encuentra domiciliado en Av. Paseo de la República 3587 – San Isidro, Lima, y ha registrado los bancos de datos de clientes y prospectos de clientes ante la Autoridad Nacional de Protección de Datos Personales del Ministerio de Justicia.",
+              "point2": "En SANTANDER CONSUMER BANK recopilamos tus datos personales de las siguientes formas:",
+              "point2a": "Interacciones directas: Nos proporcionas tus datos al interactuar directamente con nosotros en cualquiera de nuestros canales de atención, sea físicos o digitales.",
+              "point2b": "Interacciones indirectas: Obtenemos tus datos a través de medios legítimos, sea por terceros o de fuentes accesibles al público.",
+              "point3": "Utilizaremos tus datos para dar cumplimiento a los fines comerciales y/o publicitarios, tales como:",
+              "point3a": "Evaluar si calificas para contratar algún otro producto o servicio.",
+              "point3b": "Enviarte ofertas o beneficios personalizados mediante comunicaciones comerciales y/o publicitarias relacionadas con nuestras campañas, promociones y sorteos.",
+              "point3c": "Podremos trasladar tus datos a nivel nacional e internacional, tanto nosotros como nuestros encargados de tratamiento, a través de cualquier medio físico o electrónico (teléfono, correo electrónico, medios telemáticos, aplicativos de mensajería instantánea, SMS, redes sociales, páginas web o medios similares) que brinde Santander Consumer Bank y las empresas vinculadas que forman parte del Grupo Santander.",
+              "point4": "Tienes la libertad de aceptar o no aceptar la finalidad comercial y/o publicitaria. Con tu aceptación, tus datos personales serán tratados hasta que nos solicites que dejemos de hacerlo, a través del ejercicio de los derechos conferidos por la regulación de protección de datos personales.",
+              "point5": "El plazo de conservación de tus datos es de diez (10) años posteriores a nuestra relación contractual, para cumplir con las obligaciones legales pertinentes. Transcurrido dicho tiempo, tus datos serán eliminados.",
+              "point6": "Brindaremos tus datos personales, a nivel nacional e internacional, a nuestras empresas vinculadas del Grupo Santander, proveedores y aliados comerciales para los fines propios de la relación contractual y los fines autorizados.",
+              "point7": "Hemos adoptado las medidas de seguridad pertinentes con el objetivo de evitar la alteración, pérdida, tratamiento o acceso no autorizado que pueda afectar la integridad, confidencialidad y disponibilidad de la información aplicable a todos nuestros bancos de datos personales.",
+              "point8": "En todo momento puedes ejercer tus derechos ARCO (Acceso, Rectificación, Cancelación y Oposición) establecidos en la Ley de Protección de Datos Personales a través del siguiente buzón: derechos_arco@scb.com.pe",
+              "point9": "Para más información sobre cómo tratamos tus datos personales, ponemos a tu disposición nuestra Política de Privacidad disponible en nuestra página web institucional.",
+              "signature": "Atentamente,\nOficial de Protección de Datos Personales."
+            },
+            "button": "Estoy de acuerdo"
+          }
         },
         "continueButton": "Continuar"
       }

@@ -52,6 +52,13 @@
           (close)="closeModal()">
         </app-error-modal>
 
+        <!-- Privacy Modal -->
+        <app-privacy-modal 
+          [isVisible]="showPrivacyModal()" 
+          (close)="closePrivacyModal()"
+          (accept)="acceptPrivacy()">
+        </app-privacy-modal>
+
         <!-- Privacy Policy Checkbox -->
         <div class="personal-data-page__field">
           <label class="personal-data-page__checkbox">
@@ -62,11 +69,11 @@
               (blur)="onPrivacyBlur()"
               class="personal-data-page__checkbox__input"
             />
-            <span class="personal-data-page__checkbox__text">
-              {{ privacyText() }}
-              <span class="personal-data-page__checkbox__text__highlight">{{ privacyHighlight() }}</span>
-              {{ privacySuffix() }}
-            </span>
+        <span class="personal-data-page__checkbox__text">
+          {{ privacyText() }}
+          <span class="personal-data-page__checkbox__text__highlight" (click)="openPrivacyModal()">{{ privacyHighlight() }}</span>
+          {{ privacySuffix() }}
+        </span>
           </label>
         </div>
 
