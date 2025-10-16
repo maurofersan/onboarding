@@ -4,7 +4,7 @@
     <header class="personal-data-page__header">
       <h1 class="personal-data-page__title">
         <span class="personal-data-page__title__prefix">{{ titlePrefix() }}</span>
-        <span class="personal-data-page__title__highlight">{{ titleHighlight() }}</span>
+        <span class="personal-data-page__title__highlight"> {{ titleHighlight() }}</span>
       </h1>
     </header>
 
@@ -34,6 +34,7 @@
           [value]="formData().email || ''"
           [hasError]="hasFieldError('email')()"
           (valueChange)="updateField('email', $event)"
+          (blur)="onEmailBlur($event)"
         />
 
         <!-- Tax Declaration Toggle -->
@@ -45,12 +46,21 @@
           <p class="personal-data-page__disclaimer">{{ disclaimer() }}</p>
         </div>
 
+        <!-- Error Modal -->
+        <app-error-modal 
+          [isVisible]="showModal()" 
+          (close)="closeModal()">
+        </app-error-modal>
+
         <!-- Privacy Policy Checkbox -->
         <div class="personal-data-page__field">
           <label class="personal-data-page__checkbox">
             <std-checkbox
               [checked]="formData().privacyAccepted"
+              [status]="hasFieldError('privacyAccepted')() ? 'error' : 'default'"
               (stdChange)="onPrivacyChange($event)"
+              (blur)="onPrivacyBlur()"
+              class="personal-data-page__checkbox__input"
             />
             <span class="personal-data-page__checkbox__text">
               {{ privacyText() }}

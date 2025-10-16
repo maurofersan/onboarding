@@ -30,7 +30,8 @@
         "privacy": {
           "text": "Acepto las",
           "highlight": "políticas de privacidad",
-          "suffix": "y autorizo el uso de mis datos para recibir promociones y beneficios"
+          "suffix": "y autorizo el uso de mis datos para recibir promociones y beneficios",
+          "error": "Debes aceptar las políticas de privacidad"
         },
         "continueButton": "Continuar"
       }

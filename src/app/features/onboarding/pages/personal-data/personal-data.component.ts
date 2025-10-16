@@ -5,6 +5,9 @@ import {
   inject,
   computed,
   signal,
+  AfterViewInit,
+  ElementRef,
+  OnChanges,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { BaseComponent } from '../../../../shared/base/base.component';
@@ -15,19 +18,21 @@ import {
 } from '../../../../shared/interfaces/account-opening.interfaces';
 import { TaxDeclarationToggleComponent } from '../../../account-opening/components/tax-declaration-toggle/tax-declaration-toggle.component';
 import { FormFieldComponent } from '../../../account-opening/components/form-field/form-field.component';
+import { ErrorModalComponent } from './components/error-modal/error-modal.component';
 import { FormFieldConfig } from '../../../account-opening/components/form-field/form-field.component';
 
 @Component({
   selector: 'app-personal-data',
   standalone: true,
-  imports: [TaxDeclarationToggleComponent, FormFieldComponent],
+  imports: [TaxDeclarationToggleComponent, FormFieldComponent, ErrorModalComponent],
   templateUrl: './personal-data.component.html',
   styleUrl: './personal-data.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PersonalDataComponent extends BaseComponent implements OnInit {
+export class PersonalDataComponent extends BaseComponent implements OnInit, AfterViewInit, OnChanges {
   private readonly textService = inject(TextService);
   private readonly router = inject(Router);
+  private readonly elementRef = inject(ElementRef);
 
   // Form data - empty by default
   formData = signal<Partial<AccountOpeningFormData>>({
@@ -41,6 +46,9 @@ export class PersonalDataComponent extends BaseComponent implements OnInit {
 
   // Errors state - empty by default, only show when user enters invalid data
   errors = signal<FormFieldError[]>([]);
+
+  // Modal state
+  showModal = signal<boolean>(false);
 
   // Form field configurations
   readonly dniConfig: FormFieldConfig = {
@@ -135,6 +143,61 @@ export class PersonalDataComponent extends BaseComponent implements OnInit {
     // Initialize without errors - only show when user enters invalid data
   }
 
+  ngAfterViewInit(): void {
+    this.applyCheckboxErrorStyles();
+  }
+
+  ngOnChanges(): void {
+    this.applyCheckboxErrorStyles();
+  }
+
+  /**
+   * Applies error styles to std-checkbox when privacy is not accepted
+   */
+  private applyCheckboxErrorStyles(): void {
+    // Wait for DOM to be ready
+    setTimeout(() => {
+      const stdCheckbox = this.elementRef.nativeElement.querySelector('std-checkbox');
+      console.log('Found std-checkbox:', stdCheckbox);
+      
+      if (stdCheckbox) {
+        // Try different selectors to find the checkbox
+        let checkbox = stdCheckbox.querySelector('input[type="checkbox"]');
+        if (!checkbox) {
+          checkbox = stdCheckbox.shadowRoot?.querySelector('input[type="checkbox"]');
+        }
+        if (!checkbox) {
+          checkbox = stdCheckbox.querySelector('input');
+        }
+        
+        console.log('Found checkbox:', checkbox);
+        
+        if (checkbox) {
+          const hasError = this.hasFieldError('privacyAccepted')();
+          const isChecked = this.formData().privacyAccepted;
+          console.log('Has error:', hasError, 'Is checked:', isChecked);
+          
+          // Only show error if not checked AND there's an error
+          if (hasError && !isChecked) {
+            // Apply red border only to the checkbox
+            console.log('Applying red border - not checked and has error');
+            checkbox.style.border = '1px solid #e74c3c';
+            checkbox.style.boxShadow = 'none';
+            checkbox.style.outline = 'none';
+            checkbox.style.borderRadius = '4px';
+          } else {
+            // Remove all custom styles
+            console.log('Removing red border - checked or no error');
+            checkbox.style.border = '';
+            checkbox.style.boxShadow = '';
+            checkbox.style.outline = '';
+            checkbox.style.borderRadius = '';
+          }
+        }
+      }
+    }, 10);
+  }
+
   /**
    * Updates form field value
    */
@@ -148,6 +211,61 @@ export class PersonalDataComponent extends BaseComponent implements OnInit {
    */
   onDniBlur(value: string): void {
     this.validateDniOnBlur(value);
+  }
+
+  /**
+   * Handles email blur event for validation
+   */
+  onEmailBlur(value: string): void {
+    this.validateField('email', value);
+  }
+
+  /**
+   * Handles privacy checkbox change with validation
+   */
+  onPrivacyChange(event: any): void {
+    const accepted = event.detail?.checked || event.target?.checked || false;
+    console.log('Privacy checkbox changed:', accepted);
+    this.updateField('privacyAccepted', accepted);
+    this.validatePrivacyCheckbox(accepted);
+    // Apply styles after validation with multiple attempts
+    setTimeout(() => {
+      console.log('Applying checkbox styles, hasError:', this.hasFieldError('privacyAccepted')());
+      this.applyCheckboxErrorStyles();
+    }, 0);
+    
+    // Force another update after a longer delay
+    setTimeout(() => {
+      console.log('Second attempt to apply styles');
+      this.applyCheckboxErrorStyles();
+    }, 100);
+  }
+
+  /**
+   * Handles privacy checkbox blur event for validation
+   */
+  onPrivacyBlur(): void {
+    this.validatePrivacyCheckbox(this.formData().privacyAccepted || false);
+    // Apply styles after validation
+    setTimeout(() => this.applyCheckboxErrorStyles(), 0);
+  }
+
+  /**
+   * Validates privacy checkbox - shows error if not checked
+   */
+  private validatePrivacyCheckbox(accepted: boolean): void {
+    console.log('Validating privacy checkbox, accepted:', accepted);
+    this.errors.update(errors => {
+      const filteredErrors = errors.filter(error => error.field !== 'privacyAccepted');
+      if (!accepted) {
+        const errorMessage = this.textService.getText('accountOpening.welcome.form.privacy.error');
+        console.log('Adding privacy error');
+        return [...filteredErrors, { field: 'privacyAccepted', message: errorMessage }];
+      } else {
+        console.log('Removing privacy error');
+        return filteredErrors;
+      }
+    });
   }
 
   /**
@@ -226,15 +344,23 @@ export class PersonalDataComponent extends BaseComponent implements OnInit {
    */
   onTaxDeclarationChange(value: boolean): void {
     this.updateField('taxDeclaration', value);
+    
+    // Show modal ONLY when "No" is selected (value = false)
+    if (value === false) {
+      this.showModal.set(true);
+    } else {
+      // Hide modal when "Sí" is selected
+      this.showModal.set(false);
+    }
   }
 
   /**
-   * Handles privacy policy acceptance
+   * Closes the modal
    */
-  onPrivacyChange(event: any): void {
-    const accepted = event.detail?.checked || event.target?.checked || false;
-    this.updateField('privacyAccepted', accepted);
+  closeModal(): void {
+    this.showModal.set(false);
   }
+
 
   /**
    * Handles reCAPTCHA validation
