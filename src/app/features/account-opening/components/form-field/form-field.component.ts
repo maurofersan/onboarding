@@ -40,7 +40,7 @@ export class FormFieldComponent {
   readonly maxLength = computed(() => this.config?.maxLength);
 
   onInputChange(event: any): void {
-    const newValue = event.detail?.value || event.target?.value;
+    const newValue = event.detail?.value || event.target?.value || '';
     this.valueChange.emit(newValue);
   }
 

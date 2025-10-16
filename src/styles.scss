@@ -25,6 +25,20 @@ std-checkbox {
   display: inline-block;
 }
 
+std-input {
+  display: inline-block;
+  
+  input {
+    border: 1px solid #000000 !important;
+    transition: border-color 0.2s ease !important;
+  }
+  
+  &.form-field__input--error input {
+    border: 1px solid #e74c3c !important;
+    box-shadow: none !important;
+  }
+}
+
 /* Utility classes */
 .text-center {
   text-align: center;
