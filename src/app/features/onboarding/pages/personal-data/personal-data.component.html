@@ -17,6 +17,7 @@
           [value]="formData().dni || ''"
           [hasError]="hasFieldError('dni')()"
           (valueChange)="updateField('dni', $event)"
+          (focus)="onDniFocus()"
           (blur)="onDniBlur($event)"
         />
 
@@ -26,6 +27,8 @@
           [value]="formData().phone || ''"
           [hasError]="hasFieldError('phone')()"
           (valueChange)="updateField('phone', $event)"
+          (focus)="onPhoneFocus()"
+          (blur)="onPhoneBlur($event)"
         />
 
         <!-- Email Field -->
@@ -34,6 +37,7 @@
           [value]="formData().email || ''"
           [hasError]="hasFieldError('email')()"
           (valueChange)="updateField('email', $event)"
+          (focus)="onEmailFocus()"
           (blur)="onEmailBlur($event)"
         />
 

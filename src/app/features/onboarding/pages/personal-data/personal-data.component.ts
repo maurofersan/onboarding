@@ -48,6 +48,9 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
   // Errors state - empty by default, only show when user enters invalid data
   errors = signal<FormFieldError[]>([]);
 
+  // Touched fields - tracks which fields have been focused
+  touchedFields = signal<Set<keyof AccountOpeningFormData>>(new Set());
+
   // Modal states
   showModal = signal<boolean>(false);
   showPrivacyModal = signal<boolean>(false);
@@ -211,10 +214,45 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
   }
 
   /**
+   * Marks a field as touched when focused
+   */
+  onFieldFocus(field: keyof AccountOpeningFormData): void {
+    this.touchedFields.update(touched => new Set([...touched, field]));
+  }
+
+  /**
+   * Handles DNI focus event
+   */
+  onDniFocus(): void {
+    this.onFieldFocus('dni');
+  }
+
+  /**
    * Handles DNI blur event for validation
    */
   onDniBlur(value: string): void {
     this.validateDniOnBlur(value);
+  }
+
+  /**
+   * Handles phone focus event
+   */
+  onPhoneFocus(): void {
+    this.onFieldFocus('phone');
+  }
+
+  /**
+   * Handles phone blur event for validation
+   */
+  onPhoneBlur(value: string): void {
+    this.validateField('phone', value);
+  }
+
+  /**
+   * Handles email focus event
+   */
+  onEmailFocus(): void {
+    this.onFieldFocus('email');
   }
 
   /**
@@ -273,35 +311,47 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
   }
 
   /**
-   * Validates DNI on blur - shows error if less than 8 digits
+   * Validates DNI on blur - shows error if less than 8 digits or empty when touched
    */
   private validateDniOnBlur(value: string): void {
-    // Only validate if user has entered data
-    if (!value || value.trim() === '') {
+    const isTouched = this.touchedFields().has('dni');
+    const isEmpty = !value || value.trim() === '';
+    const hasValue = value && value.trim() !== '';
+    
+    // If field is touched and empty, show error
+    if (isTouched && isEmpty) {
       this.errors.update(errors => {
-        return errors.filter(error => error.field !== 'dni');
+        const filteredErrors = errors.filter(error => error.field !== 'dni');
+        return [...filteredErrors, { field: 'dni', message: 'El DNI es requerido' }];
       });
       return;
     }
-
-    // Check if DNI has at least 8 digits
-    const isValid = /^\d{8,}$/.test(value);
     
-    this.errors.update(errors => {
-      const filteredErrors = errors.filter(error => error.field !== 'dni');
-      if (!isValid) {
-        return [...filteredErrors, { field: 'dni', message: 'El DNI debe tener 8 dígitos' }];
-      }
-      return filteredErrors;
-    });
+    // If field has value, validate format
+    if (hasValue) {
+      const isValid = /^\d{8}$/.test(value);
+      
+      this.errors.update(errors => {
+        const filteredErrors = errors.filter(error => error.field !== 'dni');
+        if (!isValid) {
+          return [...filteredErrors, { field: 'dni', message: 'El DNI debe tener 8 dígitos' }];
+        }
+        return filteredErrors;
+      });
+    } else {
+      // If empty and not touched, clear errors
+      this.errors.update(errors => {
+        return errors.filter(error => error.field !== 'dni');
+      });
+    }
   }
 
   /**
-   * Validates a specific field - only show errors when user enters invalid data
+   * Validates a specific field - shows errors when touched and empty or invalid
    */
   private validateField(field: keyof AccountOpeningFormData, value: any): void {
     const rules: Record<string, (val: string) => boolean> = {
-      dni: (val: string) => /^\d{8,}$/.test(val), // At least 8 digits
+      dni: (val: string) => /^\d{8}$/.test(val), // Exactly 8 digits
       phone: (val: string) => /^\d{9}$/.test(val),
       email: (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
     };
@@ -309,28 +359,46 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     const validator = rules[field];
     if (!validator) return;
 
-    // Only validate if user has entered data
-    if (!value || value.trim() === '') {
+    const isTouched = this.touchedFields().has(field);
+    const isEmpty = !value || value.trim() === '';
+    const hasValue = value && value.trim() !== '';
+    
+    // If field is touched and empty, show required error
+    if (isTouched && isEmpty) {
       this.errors.update(errors => {
-        return errors.filter(error => error.field !== field);
+        const filteredErrors = errors.filter(error => error.field !== field);
+        const requiredMessages: Record<string, string> = {
+          dni: 'El DNI es requerido',
+          phone: 'El celular es requerido',
+          email: 'El correo electrónico es requerido',
+        };
+        return [...filteredErrors, { field, message: requiredMessages[field] || 'Este campo es requerido' }];
       });
       return;
     }
-
-    const isValid = validator(value);
     
-    this.errors.update(errors => {
-      const filteredErrors = errors.filter(error => error.field !== field);
-      if (!isValid) {
-        const errorMessages: Record<string, string> = {
-          dni: 'El DNI debe tener al menos 8 dígitos',
-          phone: 'El celular debe tener 9 dígitos',
-          email: 'Ingresa un correo electrónico válido',
-        };
-        return [...filteredErrors, { field, message: errorMessages[field] || 'Error de validación' }];
-      }
-      return filteredErrors;
-    });
+    // If field has value, validate format
+    if (hasValue) {
+      const isValid = validator(value);
+      
+      this.errors.update(errors => {
+        const filteredErrors = errors.filter(error => error.field !== field);
+        if (!isValid) {
+          const errorMessages: Record<string, string> = {
+            dni: 'El DNI debe tener 8 dígitos',
+            phone: 'El celular debe tener 9 dígitos',
+            email: 'Ingresa un correo electrónico válido',
+          };
+          return [...filteredErrors, { field, message: errorMessages[field] || 'Error de validación' }];
+        }
+        return filteredErrors;
+      });
+    } else {
+      // If empty and not touched, clear errors
+      this.errors.update(errors => {
+        return errors.filter(error => error.field !== field);
+      });
+    }
   }
 
   /**

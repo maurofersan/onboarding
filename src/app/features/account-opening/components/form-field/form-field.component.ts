@@ -37,6 +37,7 @@ export class FormFieldComponent {
   @Input() value: string = '';
   @Input() hasError: boolean = false;
   @Output() valueChange = new EventEmitter<string>();
+  @Output() focus = new EventEmitter<void>();
   @Output() blur = new EventEmitter<string>();
 
   readonly fieldType = computed(() => this.config?.type || 'text');
@@ -47,6 +48,10 @@ export class FormFieldComponent {
   onInputChange(event: any): void {
     const newValue = event.detail?.value || event.target?.value || '';
     this.valueChange.emit(newValue);
+  }
+
+  onFocus(event: any): void {
+    this.focus.emit();
   }
 
   onBlur(event: any): void {

@@ -1,15 +1,21 @@
-import { Directive, ElementRef, HostListener } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 
 @Directive({
   selector: '[appNumbersOnly]',
   standalone: true
 })
 export class NumbersOnlyDirective {
+  @Input() appNumbersOnly: boolean = true;
 
   constructor(private el: ElementRef) { }
 
   @HostListener('keydown', ['$event'])
   onKeyDown(event: KeyboardEvent): void {
+    // Solo aplicar restricciones si la directiva está activa
+    if (!this.appNumbersOnly) {
+      return;
+    }
+
     // Permitir teclas especiales
     const allowedKeys = [
       'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
@@ -38,6 +44,11 @@ export class NumbersOnlyDirective {
 
   @HostListener('paste', ['$event'])
   onPaste(event: ClipboardEvent): void {
+    // Solo aplicar restricciones si la directiva está activa
+    if (!this.appNumbersOnly) {
+      return;
+    }
+
     const clipboardData = event.clipboardData;
     if (clipboardData) {
       const pastedText = clipboardData.getData('text');
@@ -50,6 +61,11 @@ export class NumbersOnlyDirective {
 
   @HostListener('input', ['$event'])
   onInput(event: Event): void {
+    // Solo aplicar restricciones si la directiva está activa
+    if (!this.appNumbersOnly) {
+      return;
+    }
+
     const input = event.target as HTMLInputElement;
     const value = input.value;
     
