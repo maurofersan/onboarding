@@ -42,7 +42,11 @@ export class PrivacyModalComponent {
     this.close.emit();
   }
 
-  onAccept(): void {
+  onAccept(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.accept.emit();
   }
 

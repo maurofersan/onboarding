@@ -382,7 +382,14 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    */
   acceptPrivacy(): void {
     this.showPrivacyModal.set(false);
-    // Optionally, you can add logic here when user accepts privacy
+    
+    // Activate the privacy checkbox when user accepts
+    this.updateField('privacyAccepted', true);
+    
+    // Remove any privacy errors since user accepted
+    this.errors.update(errors => errors.filter(error => error.field !== 'privacyAccepted'));
+    
+    console.log('Privacy accepted, checkbox should be checked:', this.formData().privacyAccepted);
   }
 
 
