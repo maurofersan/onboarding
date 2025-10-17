@@ -38,7 +38,11 @@ export class PrivacyModalComponent {
   readonly signature = this.textService.getText('accountOpening.welcome.form.privacy.modal.content.signature');
   readonly buttonText = this.textService.getText('accountOpening.welcome.form.privacy.modal.button');
 
-  onClose(): void {
+  onClose(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.close.emit();
   }
 

@@ -60,6 +60,8 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     type: 'text',
     maxLength: 8,
     required: true,
+    numbersOnly: true,
+    dniValidation: true,
   };
 
   readonly phoneConfig: FormFieldConfig = {
