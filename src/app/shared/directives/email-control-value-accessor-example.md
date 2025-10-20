@@ -2,9 +2,9 @@
 
 ## Uso en el template
 
-### Opción 1: Con Reactive Forms
+### Opción 1: Con Reactive Forms (Standalone)
 ```html
-<!-- En tu componente -->
+<!-- En tu componente standalone -->
 <form [formGroup]="form">
   <std-input
     appEmailControlValueAccessor
@@ -16,16 +16,75 @@
 </form>
 ```
 
-### Opción 2: Con Template-driven Forms
-```html
-<!-- En tu componente -->
-<std-input
-  appEmailControlValueAccessor
-  [(ngModel)]="email"
-  type="email"
-  label="Correo electrónico"
-  placeholder="Ingresa tu correo"
-/>
+### Eventos que escucha la directiva:
+- `changeEvent` - Evento principal del std-input cuando cambia el valor
+- `blurEvent` - Evento cuando el input pierde el foco
+- `focusEvent` - Evento cuando el input recibe el foco
+- `input` - Evento nativo como fallback
+- `blur` - Evento nativo como fallback
+
+### Importar en el componente standalone
+```typescript
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { EmailControlValueAccessorDirective } from './shared/directives/email-control-value-accessor.directive';
+
+@Component({
+  selector: 'app-your-component',
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    EmailControlValueAccessorDirective
+  ],
+  template: `
+    <form [formGroup]="form">
+      <std-input
+        appEmailControlValueAccessor
+        formControlName="email"
+        type="email"
+        label="Correo electrónico"
+        placeholder="Ingresa tu correo"
+      />
+    </form>
+  `
+})
+export class YourComponent {
+  form: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    this.form = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
+  }
+}
+```
+
+### Opción 2: Con Template-driven Forms (Standalone)
+```typescript
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { EmailControlValueAccessorDirective } from './shared/directives/email-control-value-accessor.directive';
+
+@Component({
+  selector: 'app-your-component',
+  standalone: true,
+  imports: [
+    FormsModule,
+    EmailControlValueAccessorDirective
+  ],
+  template: `
+    <std-input
+      appEmailControlValueAccessor
+      [(ngModel)]="email"
+      type="email"
+      label="Correo electrónico"
+      placeholder="Ingresa tu correo"
+    />
+  `
+})
+export class YourComponent {
+  email: string = '';
+}
 ```
 
 ### Opción 3: Con FormField Component
@@ -72,8 +131,31 @@ export class YourComponent {
 }
 ```
 
+## Uso Standalone
+
+### Importar la directiva en cualquier componente
+```typescript
+import { EmailControlValueAccessorDirective } from './shared/directives/email-control-value-accessor.directive';
+
+@Component({
+  // ...
+  imports: [
+    EmailControlValueAccessorDirective, // ← Solo agregar aquí
+    // otros imports...
+  ]
+})
+```
+
+### Ventajas del Standalone
+- ✅ **No necesita módulos** - se importa directamente
+- ✅ **Tree-shaking** - solo se incluye si se usa
+- ✅ **Fácil de reutilizar** en cualquier componente
+- ✅ **Compatible** con Angular 14+
+- ✅ **Mejor rendimiento** - menos código cargado
+
 ## Características de la directiva
 
+- ✅ **Standalone directive** - no requiere módulos
 - ✅ **Implementa ControlValueAccessor** para integración con Angular Forms
 - ✅ **Escucha eventos `stdInput`** del componente std-input
 - ✅ **Maneja eventos `blur` y `focus`** correctamente

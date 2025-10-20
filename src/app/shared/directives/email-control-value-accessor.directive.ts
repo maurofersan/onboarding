@@ -4,6 +4,7 @@ import { Subject, takeUntil } from 'rxjs';
 
 @Directive({
   selector: '[appEmailControlValueAccessor]',
+  standalone: true,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -26,22 +27,37 @@ export class EmailControlValueAccessorDirective implements ControlValueAccessor,
       return;
     }
 
-    // Listen to input events from std-input
-    this.elementRef.nativeElement.addEventListener('stdInput', (event: any) => {
-      const value = event.detail?.value || event.target?.value || '';
-      console.log('Email CVA - stdInput event:', value);
+    console.log('Email CVA - Directive initialized on:', this.elementRef.nativeElement);
+
+    // Listen to changeEvent from std-input (this is the main input event)
+    this.elementRef.nativeElement.addEventListener('changeEvent', (event: any) => {
+      const value = event.detail || event.target?.value || '';
+      console.log('Email CVA - changeEvent received:', value);
       this.onChange(value);
     });
 
-    // Listen to blur events
-    this.elementRef.nativeElement.addEventListener('blur', (event: any) => {
-      console.log('Email CVA - blur event');
+    // Listen to blurEvent from std-input
+    this.elementRef.nativeElement.addEventListener('blurEvent', (event: any) => {
+      console.log('Email CVA - blurEvent received');
       this.onTouched();
     });
 
-    // Listen to focus events
-    this.elementRef.nativeElement.addEventListener('focus', (event: any) => {
-      console.log('Email CVA - focus event');
+    // Listen to focusEvent from std-input
+    this.elementRef.nativeElement.addEventListener('focusEvent', (event: any) => {
+      console.log('Email CVA - focusEvent received');
+    });
+
+    // Also listen to native input events as fallback
+    this.elementRef.nativeElement.addEventListener('input', (event: any) => {
+      const value = event.target?.value || '';
+      console.log('Email CVA - native input event:', value);
+      this.onChange(value);
+    });
+
+    // Also listen to native blur events as fallback
+    this.elementRef.nativeElement.addEventListener('blur', (event: any) => {
+      console.log('Email CVA - native blur event');
+      this.onTouched();
     });
   }
 
