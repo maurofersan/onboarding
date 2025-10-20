@@ -45,6 +45,7 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     recaptchaValid: false,
   });
 
+
   // Errors state - empty by default, only show when user enters invalid data
   errors = signal<FormFieldError[]>([]);
 
@@ -135,7 +136,9 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
 
   readonly hasFieldError = (field: keyof AccountOpeningFormData) => {
     return computed(() => {
-      return this.errors().some(error => error.field === field);
+      const hasError = this.errors().some(error => error.field === field);
+      console.log(`hasFieldError for ${field}:`, hasError, 'errors:', this.errors());
+      return hasError;
     });
   };
 
@@ -157,6 +160,7 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
   ngOnChanges(): void {
     this.applyCheckboxErrorStyles();
   }
+
 
   /**
    * Applies error styles to std-checkbox when privacy is not accepted
@@ -209,15 +213,25 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    * Updates form field value
    */
   updateField(field: keyof AccountOpeningFormData, value: any): void {
-    this.formData.update(data => ({ ...data, [field]: value }));
-    // Don't validate on input change, only on blur
+    console.log(`updateField called for ${field} with value:`, value);
+    this.formData.update(data => {
+      const newData = { ...data, [field]: value };
+      console.log(`Updated formData for ${field}:`, newData);
+      return newData;
+    });
   }
+
 
   /**
    * Marks a field as touched when focused
    */
   onFieldFocus(field: keyof AccountOpeningFormData): void {
-    this.touchedFields.update(touched => new Set([...touched, field]));
+    console.log(`onFieldFocus called for ${field}`);
+    this.touchedFields.update(touched => {
+      const newTouched = new Set([...touched, field]);
+      console.log(`Updated touchedFields:`, Array.from(newTouched));
+      return newTouched;
+    });
   }
 
   /**
@@ -231,6 +245,7 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    * Handles DNI blur event for validation
    */
   onDniBlur(value: string): void {
+    console.log('onDniBlur called with value:', value);
     this.validateDniOnBlur(value);
   }
 
@@ -245,7 +260,8 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    * Handles phone blur event for validation
    */
   onPhoneBlur(value: string): void {
-    this.validateField('phone', value);
+    console.log('onPhoneBlur called with value:', value);
+    this.validatePhoneOnBlur(value);
   }
 
   /**
@@ -259,7 +275,8 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    * Handles email blur event for validation
    */
   onEmailBlur(value: string): void {
-    this.validateField('email', value);
+    console.log('onEmailBlur called with value:', value);
+    this.validateEmailOnBlur(value);
   }
 
   /**
@@ -314,36 +331,120 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    * Validates DNI on blur - shows error if less than 8 digits or empty when touched
    */
   private validateDniOnBlur(value: string): void {
+    console.log('validateDniOnBlur called with value:', value);
     const isTouched = this.touchedFields().has('dni');
     const isEmpty = !value || value.trim() === '';
     const hasValue = value && value.trim() !== '';
     
-    // If field is touched and empty, show error
-    if (isTouched && isEmpty) {
-      this.errors.update(errors => {
-        const filteredErrors = errors.filter(error => error.field !== 'dni');
-        return [...filteredErrors, { field: 'dni', message: 'El DNI es requerido' }];
-      });
+    console.log('DNI validation:', { value, isTouched, isEmpty, hasValue });
+    
+    // Only validate if the field has been touched by the user
+    if (!isTouched) {
+      console.log('DNI not touched, skipping validation');
       return;
     }
     
-    // If field has value, validate format
-    if (hasValue) {
-      const isValid = /^\d{8}$/.test(value);
-      
-      this.errors.update(errors => {
-        const filteredErrors = errors.filter(error => error.field !== 'dni');
+    // Clear all errors for DNI first
+    this.errors.update(errors => {
+      const filteredErrors = errors.filter(error => error.field !== 'dni');
+      let newErrors = [...filteredErrors];
+
+      // If field has value, validate format
+      if (hasValue) {
+        const isValid = /^\d{8}$/.test(value);
+        console.log('DNI format validation:', { value, isValid });
+        
         if (!isValid) {
-          return [...filteredErrors, { field: 'dni', message: 'El DNI debe tener 8 dígitos' }];
+          newErrors.push({ field: 'dni', message: 'El DNI debe tener 8 dígitos' });
         }
-        return filteredErrors;
-      });
-    } else {
-      // If empty and not touched, clear errors
-      this.errors.update(errors => {
-        return errors.filter(error => error.field !== 'dni');
-      });
+      }
+      // If field is touched and empty, show required error
+      else if (isEmpty) {
+        newErrors.push({ field: 'dni', message: 'El DNI es requerido' });
+      }
+
+      return newErrors;
+    });
+  }
+
+  /**
+   * Validates phone on blur - shows error if less than 9 digits or empty when touched
+   */
+  private validatePhoneOnBlur(value: string): void {
+    console.log('validatePhoneOnBlur called with value:', value);
+    const isTouched = this.touchedFields().has('phone');
+    const isEmpty = !value || value.trim() === '';
+    const hasValue = value && value.trim() !== '';
+    
+    console.log('Phone validation:', { value, isTouched, isEmpty, hasValue });
+    
+    // Only validate if the field has been touched by the user
+    if (!isTouched) {
+      console.log('Phone not touched, skipping validation');
+      return;
     }
+    
+    // Clear all errors for phone first
+    this.errors.update(errors => {
+      const filteredErrors = errors.filter(error => error.field !== 'phone');
+      let newErrors = [...filteredErrors];
+
+      // If field has value, validate format
+      if (hasValue) {
+        const isValid = /^\d{9}$/.test(value);
+        console.log('Phone format validation:', { value, isValid });
+        
+        if (!isValid) {
+          newErrors.push({ field: 'phone', message: 'El celular debe tener 9 dígitos' });
+        }
+      }
+      // If field is touched and empty, show required error
+      else if (isEmpty) {
+        newErrors.push({ field: 'phone', message: 'El celular es requerido' });
+      }
+
+      return newErrors;
+    });
+  }
+
+  /**
+   * Validates email on blur - shows error if invalid format or empty when touched
+   */
+  private validateEmailOnBlur(value: string): void {
+    console.log('validateEmailOnBlur called with value:', value);
+    const isTouched = this.touchedFields().has('email');
+    const isEmpty = !value || value.trim() === '';
+    const hasValue = value && value.trim() !== '';
+    
+    console.log('Email validation:', { value, isTouched, isEmpty, hasValue });
+    
+    // Only validate if the field has been touched by the user
+    if (!isTouched) {
+      console.log('Email not touched, skipping validation');
+      return;
+    }
+    
+    // Clear all errors for email first
+    this.errors.update(errors => {
+      const filteredErrors = errors.filter(error => error.field !== 'email');
+      let newErrors = [...filteredErrors];
+
+      // If field has value, validate format
+      if (hasValue) {
+        const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        console.log('Email format validation:', { value, isValid });
+        
+        if (!isValid) {
+          newErrors.push({ field: 'email', message: 'Ingresa un correo electrónico válido' });
+        }
+      }
+      // If field is touched and empty, show required error
+      else if (isEmpty) {
+        newErrors.push({ field: 'email', message: 'El correo electrónico es requerido' });
+      }
+
+      return newErrors;
+    });
   }
 
   /**
@@ -357,48 +458,58 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     };
 
     const validator = rules[field];
-    if (!validator) return;
+    if (!validator) {
+      return;
+    }
 
     const isTouched = this.touchedFields().has(field);
     const isEmpty = !value || value.trim() === '';
     const hasValue = value && value.trim() !== '';
     
-    // If field is touched and empty, show required error
-    if (isTouched && isEmpty) {
-      this.errors.update(errors => {
-        const filteredErrors = errors.filter(error => error.field !== field);
-        const requiredMessages: Record<string, string> = {
-          dni: 'El DNI es requerido',
-          phone: 'El celular es requerido',
-          email: 'El correo electrónico es requerido',
-        };
-        return [...filteredErrors, { field, message: requiredMessages[field] || 'Este campo es requerido' }];
-      });
+    console.log(`validateField for ${field}:`, {
+      value,
+      isTouched,
+      isEmpty,
+      hasValue,
+      touchedFields: Array.from(this.touchedFields())
+    });
+    
+    // Only validate if the field has been touched by the user
+    if (!isTouched) {
+      console.log(`Field ${field} not touched, skipping validation`);
       return;
     }
     
-    // If field has value, validate format
-    if (hasValue) {
-      const isValid = validator(value);
+    // Clear all errors for this field first
+    this.errors.update(errors => {
+      const filteredErrors = errors.filter(error => error.field !== field);
+      let newErrors = [...filteredErrors];
       
-      this.errors.update(errors => {
-        const filteredErrors = errors.filter(error => error.field !== field);
+      // If field has value, validate format
+      if (hasValue) {
+        const isValid = validator(value);
+        
         if (!isValid) {
           const errorMessages: Record<string, string> = {
             dni: 'El DNI debe tener 8 dígitos',
             phone: 'El celular debe tener 9 dígitos',
             email: 'Ingresa un correo electrónico válido',
           };
-          return [...filteredErrors, { field, message: errorMessages[field] || 'Error de validación' }];
+          newErrors.push({ field, message: errorMessages[field] || 'Error de validación' });
         }
-        return filteredErrors;
-      });
-    } else {
-      // If empty and not touched, clear errors
-      this.errors.update(errors => {
-        return errors.filter(error => error.field !== field);
-      });
-    }
+      }
+      // If field is touched and empty, show required error
+      else if (isEmpty) {
+        const requiredMessages: Record<string, string> = {
+          dni: 'El DNI es requerido',
+          phone: 'El celular es requerido',
+          email: 'El correo electrónico es requerido',
+        };
+        newErrors.push({ field, message: requiredMessages[field] || 'Este campo es requerido' });
+      }
+      
+      return newErrors;
+    });
   }
 
   /**
