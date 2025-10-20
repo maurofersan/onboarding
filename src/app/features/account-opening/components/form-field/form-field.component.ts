@@ -6,10 +6,11 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   inject,
   computed,
+  ElementRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TextService } from '../../../../core/services/text.service';
-import { NumbersOnlyDirective } from '../../../../shared/directives';
+import { NumbersOnlyDirective, EmailControlValueAccessorDirective } from '../../../../shared/directives';
 
 export interface FormFieldConfig {
   label: string;
@@ -25,13 +26,14 @@ export interface FormFieldConfig {
 @Component({
   selector: 'app-form-field',
   standalone: true,
-  imports: [CommonModule, NumbersOnlyDirective ],
+  imports: [CommonModule, NumbersOnlyDirective, EmailControlValueAccessorDirective],
   templateUrl: './form-field.component.html',
   styleUrl: './form-field.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class FormFieldComponent {
   private readonly textService = inject(TextService);
+  private readonly elementRef = inject(ElementRef);
 
   @Input() config!: FormFieldConfig;
   @Input() value: string = '';
@@ -58,6 +60,12 @@ export class FormFieldComponent {
   }
 
   onBlur(event: any): void {
+    // Si es un campo de email y tiene la directiva CVA, no interferir
+    if (this.config?.type === 'email' && this.elementRef.nativeElement.hasAttribute('appEmailControlValueAccessor')) {
+      console.log('FormField onBlur - Email CVA active, skipping form-field logic');
+      return;
+    }
+
     // Try to get the value from different possible sources
     let value = '';
     

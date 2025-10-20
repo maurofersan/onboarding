@@ -32,14 +32,27 @@
         />
 
         <!-- Email Field -->
-        <app-form-field
-          [config]="emailConfig"
-          [value]="formData().email || ''"
-          [hasError]="hasFieldError('email')()"
-          (valueChange)="updateField('email', $event)"
-          (focus)="onEmailFocus()"
-          (blur)="onEmailBlur($event)"
-        />
+        <div [formGroup]="emailForm">
+          <app-form-field
+            [config]="emailConfig"
+            [value]="emailForm.get('email')?.value || ''"
+            [hasError]="emailHasError()"
+            (valueChange)="updateEmailField($event)"
+            (focus)="onEmailFocus()"
+            (blur)="onEmailBlur($event)"
+          />
+          <!-- Mostrar errores del FormControl -->
+          <div *ngIf="emailForm.get('email')?.invalid && emailForm.get('email')?.touched" class="form-field__error">
+            <span class="form-field__error__text">
+              <ng-container *ngIf="emailForm.get('email')?.errors?.['required']">
+                El correo electrónico es requerido
+              </ng-container>
+              <ng-container *ngIf="emailForm.get('email')?.errors?.['email']">
+                Ingresa un correo electrónico válido
+              </ng-container>
+            </span>
+          </div>
+        </div>
 
         <!-- Tax Declaration Toggle -->
         <div class="personal-data-page__field">

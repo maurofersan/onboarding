@@ -201,3 +201,19 @@
     padding: 2rem;
   }
 }
+
+// Estilos para el error del email
+.form-field__error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  color: #e74c3c;
+  font-size: 0.875rem;
+
+  &__text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}

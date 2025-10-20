@@ -10,6 +10,8 @@ import {
   OnChanges,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { BaseComponent } from '../../../../shared/base/base.component';
 import { TextService } from '../../../../core/services/text.service';
 import {
@@ -25,7 +27,7 @@ import { FormFieldConfig } from '../../../account-opening/components/form-field/
 @Component({
   selector: 'app-personal-data',
   standalone: true,
-  imports: [TaxDeclarationToggleComponent, FormFieldComponent, ErrorModalComponent, PrivacyModalComponent],
+  imports: [TaxDeclarationToggleComponent, FormFieldComponent, ErrorModalComponent, PrivacyModalComponent, ReactiveFormsModule, CommonModule],
   templateUrl: './personal-data.component.html',
   styleUrl: './personal-data.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -33,6 +35,24 @@ import { FormFieldConfig } from '../../../account-opening/components/form-field/
 export class PersonalDataComponent extends BaseComponent implements OnInit, AfterViewInit, OnChanges {
   private readonly textService = inject(TextService);
   private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+
+  // FormGroup para el email
+  emailForm!: FormGroup;
+
+  // Computed signal para el error del email
+  readonly emailHasError = computed(() => {
+    const emailControl = this.emailForm?.get('email');
+    const hasError = !!(emailControl?.invalid && emailControl?.touched);
+    console.log('emailHasError computed:', {
+      invalid: emailControl?.invalid,
+      touched: emailControl?.touched,
+      hasError: hasError,
+      value: emailControl?.value,
+      errors: emailControl?.errors
+    });
+    return hasError;
+  });
   private readonly elementRef = inject(ElementRef);
 
   // Form data - empty by default
@@ -151,6 +171,11 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
 
   ngOnInit(): void {
     // Initialize without errors - only show when user enters invalid data
+    
+    // Inicializar FormGroup para el email
+    this.emailForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
   }
 
   ngAfterViewInit(): void {
@@ -221,6 +246,27 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     });
   }
 
+  updateEmailField(value: string): void {
+    console.log('updateEmailField called with value:', value);
+    
+    // Actualizar el FormControl
+    this.emailForm.get('email')?.setValue(value);
+    this.emailForm.get('email')?.markAsTouched();
+    this.emailForm.get('email')?.markAsDirty();
+    
+    // Actualizar el formData
+    this.updateField('email', value);
+    
+    // Log del estado
+    console.log('Email FormControl state:', {
+      value: this.emailForm.get('email')?.value,
+      invalid: this.emailForm.get('email')?.invalid,
+      touched: this.emailForm.get('email')?.touched,
+      dirty: this.emailForm.get('email')?.dirty,
+      errors: this.emailForm.get('email')?.errors
+    });
+  }
+
 
   /**
    * Marks a field as touched when focused
@@ -276,6 +322,20 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    */
   onEmailBlur(value: string): void {
     console.log('onEmailBlur called with value:', value);
+    
+    // Actualizar el FormControl con el valor
+    this.emailForm.get('email')?.setValue(value);
+    this.emailForm.get('email')?.markAsTouched();
+    
+    // Log del estado después del blur
+    console.log('Email FormControl after blur:', {
+      value: this.emailForm.get('email')?.value,
+      invalid: this.emailForm.get('email')?.invalid,
+      touched: this.emailForm.get('email')?.touched,
+      errors: this.emailForm.get('email')?.errors
+    });
+    
+    // También ejecutar la validación personalizada
     this.validateEmailOnBlur(value);
   }
 
