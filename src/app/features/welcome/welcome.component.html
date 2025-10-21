@@ -1,0 +1,68 @@
+<div class="welcome-page">
+  <div class="welcome-page__container">
+    <!-- Main Illustration -->
+    <div class="welcome-page__illustration">
+      <img src="assets/images/welcome/Illustration group.svg" alt="Welcome illustration" class="welcome-page__illustration__image">
+    </div>
+
+    <!-- Main Title -->
+    <header class="welcome-page__header">
+      <h1 class="welcome-page__title">
+        <span class="welcome-page__title__line">Abre tu cuenta de</span>
+        <span class="welcome-page__title__line">ahorros</span>
+        <span class="welcome-page__title__line welcome-page__title__line--highlight">en minutos</span>
+      </h1>
+    </header>
+
+    <!-- Features List -->
+    <main class="welcome-page__main">
+      <div class="welcome-page__features">
+        <!-- Feature 1: Transfer -->
+        <div class="welcome-page__feature">
+          <div class="welcome-page__feature__icon">
+            <img src="assets/images/welcome/Vector.svg" alt="Transfer icon" class="welcome-page__feature__icon__image">
+          </div>
+          <span class="welcome-page__feature__text">{{ featureTransfer() }}</span>
+        </div>
+
+        <!-- Feature 2: Digital Operations -->
+        <div class="welcome-page__feature">
+          <div class="welcome-page__feature__icon">
+            <img src="assets/images/welcome/Vector2.svg" alt="Mobile icon" class="welcome-page__feature__icon__image">
+          </div>
+          <span class="welcome-page__feature__text">{{ featureDigitalOps() }}</span>
+        </div>
+
+        <!-- Feature 3: Santander Support -->
+        <div class="welcome-page__feature">
+          <div class="welcome-page__feature__icon">
+            <img src="assets/images/welcome/Shape (1).svg" alt="Santander shield icon" class="welcome-page__feature__icon__image">
+          </div>
+          <span class="welcome-page__feature__text">{{ featureSantanderSupport() }}</span>
+        </div>
+      </div>
+
+      <!-- Information Box -->
+      <div class="welcome-page__info-box">
+        <div class="welcome-page__info-box__icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="9" fill="#127277"/>
+            <path d="M10 6V10M10 14H10.01" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="welcome-page__info-box__text">
+          Te recomendamos realizar la apertura de tu cuenta desde tu celular y con tu <strong>DNI a la mano</strong>.
+        </p>
+      </div>
+    </main>
+
+    <!-- Call to Action Button -->
+    <footer class="welcome-page__actions">
+      <std-button
+        class="welcome-page__start-btn"
+        (click)="onContinue()"
+        [label]="startButton()"
+      />
+    </footer>
+  </div>
+</div>
