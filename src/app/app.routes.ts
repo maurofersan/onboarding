@@ -4,6 +4,12 @@ import { IDENTITY_ROUTES } from './features/identity.routes';
 
 export const routes: Routes = [
   {
+    path: 'account-opening',
+    loadComponent: () =>
+      import('./features/welcome/welcome.component')
+        .then(c => c.WelcomeComponent),
+  },
+  {
     path: 'biometria',
     children: IDENTITY_ROUTES,
   },
@@ -16,7 +22,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'account-opening-personal-data',
+    redirectTo: 'account-opening',
     pathMatch: 'full',
   },
 ];

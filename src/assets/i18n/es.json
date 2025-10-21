@@ -2,8 +2,17 @@
   "accountOpening": {
     "welcome": {
       "title": {
-        "prefix": "Empecemos con",
-        "highlight": "tus datos"
+        "prefix": "Abre tu cuenta de ahorros en",
+        "highlight": "minutos"
+      },
+      "features": {
+        "transfer": "Recibe transferencias desde el primer día",
+        "digital_ops": "Realiza operaciones digitales y acceso 24/7",
+        "santander_support": "Con la solidez y respaldo global de Santander"
+      },
+      "info_recommendation": "Te recomendamos realizar la apertura de tu cuenta desde tu celular y con tu DNI a la mano.",
+      "button": {
+        "start": "Empezar"
       },
       "form": {
         "dni": {
