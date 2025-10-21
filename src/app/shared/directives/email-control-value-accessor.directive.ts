@@ -17,6 +17,7 @@ export class EmailControlValueAccessorDirective implements ControlValueAccessor,
   private destroy$ = new Subject<void>();
   private onChange = (value: any) => {};
   private onTouched = () => {};
+  private currentValue: string = ''; // Almacenar el valor actual
 
   @Input() appEmailControlValueAccessor: boolean = false;
 
@@ -33,12 +34,17 @@ export class EmailControlValueAccessorDirective implements ControlValueAccessor,
     this.elementRef.nativeElement.addEventListener('changeEvent', (event: any) => {
       const value = event.detail || event.target?.value || '';
       console.log('Email CVA - changeEvent received:', value);
+      this.currentValue = value; // Almacenar el valor actual
       this.onChange(value);
     });
 
     // Listen to blurEvent from std-input
     this.elementRef.nativeElement.addEventListener('blurEvent', (event: any) => {
-      console.log('Email CVA - blurEvent received');
+      console.log('Email CVA - blurEvent received, currentValue:', this.currentValue);
+      // Usar el valor almacenado si el evento no tiene valor
+      if (this.currentValue) {
+        this.onChange(this.currentValue);
+      }
       this.onTouched();
     });
 
@@ -51,12 +57,17 @@ export class EmailControlValueAccessorDirective implements ControlValueAccessor,
     this.elementRef.nativeElement.addEventListener('input', (event: any) => {
       const value = event.target?.value || '';
       console.log('Email CVA - native input event:', value);
+      this.currentValue = value; // Almacenar el valor actual
       this.onChange(value);
     });
 
     // Also listen to native blur events as fallback
     this.elementRef.nativeElement.addEventListener('blur', (event: any) => {
-      console.log('Email CVA - native blur event');
+      console.log('Email CVA - native blur event, currentValue:', this.currentValue);
+      // Usar el valor almacenado si el evento no tiene valor
+      if (this.currentValue) {
+        this.onChange(this.currentValue);
+      }
       this.onTouched();
     });
   }
@@ -69,6 +80,8 @@ export class EmailControlValueAccessorDirective implements ControlValueAccessor,
   // ControlValueAccessor implementation
   writeValue(value: any): void {
     console.log('Email CVA - writeValue called with:', value);
+    // Almacenar el valor actual
+    this.currentValue = value || '';
     if (this.elementRef.nativeElement) {
       this.elementRef.nativeElement.value = value || '';
     }
