@@ -23,12 +23,49 @@ export class EmailControlValueAccessorDirective implements ControlValueAccessor,
 
   constructor(private elementRef: ElementRef) {}
 
+  // Método para capturar el valor desde el changeEvent
+  private captureValueFromChangeEvent(event: any): string {
+    let value = '';
+    
+    // Intentar obtener el valor de diferentes maneras
+    if (event.detail) {
+      value = event.detail;
+    } else if (event.target && event.target.value) {
+      value = event.target.value;
+    } else if (event.target && event.target.getAttribute('value')) {
+      value = event.target.getAttribute('value');
+    }
+    
+    console.log('Email CVA - captureValueFromChangeEvent:', {
+      'event.detail': event.detail,
+      'event.target.value': event.target?.value,
+      'event.target.getAttribute': event.target?.getAttribute('value'),
+      'final value': value
+    });
+    
+    return value;
+  }
+
   // Método para obtener el valor directamente del elemento
   private getCurrentValue(): string {
     const element = this.elementRef.nativeElement;
     if (element) {
       // Intentar obtener el valor de diferentes maneras
-      const value = element.value || element.getAttribute('value') || '';
+      let value = element.value || element.getAttribute('value') || '';
+      
+      // Si no hay valor, intentar obtenerlo del shadowRoot
+      if (!value && element.shadowRoot) {
+        const input = element.shadowRoot.querySelector('input');
+        if (input) {
+          value = input.value || '';
+        }
+      }
+      
+      // Si aún no hay valor, usar el valor almacenado
+      if (!value) {
+        value = this.currentValue;
+      }
+      
       console.log('Email CVA - getCurrentValue:', value);
       return value;
     }
@@ -44,10 +81,16 @@ export class EmailControlValueAccessorDirective implements ControlValueAccessor,
 
     // Listen to changeEvent from std-input (this is the main input event)
     this.elementRef.nativeElement.addEventListener('changeEvent', (event: any) => {
-      const value = event.detail || event.target?.value || '';
+      const value = this.captureValueFromChangeEvent(event);
       console.log('Email CVA - changeEvent received:', value);
-      console.log('Email CVA - changeEvent event.detail:', event.detail);
-      console.log('Email CVA - changeEvent event.target:', event.target);
+      this.currentValue = value; // Almacenar el valor actual
+      this.onChange(value);
+    });
+
+    // También escuchar el evento stdInput como fallback
+    this.elementRef.nativeElement.addEventListener('stdInput', (event: any) => {
+      const value = event.detail || event.target?.value || '';
+      console.log('Email CVA - stdInput received:', value);
       this.currentValue = value; // Almacenar el valor actual
       this.onChange(value);
     });
