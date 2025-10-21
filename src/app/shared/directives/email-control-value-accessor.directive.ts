@@ -23,6 +23,18 @@ export class EmailControlValueAccessorDirective implements ControlValueAccessor,
 
   constructor(private elementRef: ElementRef) {}
 
+  // Método para obtener el valor directamente del elemento
+  private getCurrentValue(): string {
+    const element = this.elementRef.nativeElement;
+    if (element) {
+      // Intentar obtener el valor de diferentes maneras
+      const value = element.value || element.getAttribute('value') || '';
+      console.log('Email CVA - getCurrentValue:', value);
+      return value;
+    }
+    return this.currentValue;
+  }
+
   ngOnInit(): void {
     if (!this.appEmailControlValueAccessor) {
       return;
@@ -34,6 +46,8 @@ export class EmailControlValueAccessorDirective implements ControlValueAccessor,
     this.elementRef.nativeElement.addEventListener('changeEvent', (event: any) => {
       const value = event.detail || event.target?.value || '';
       console.log('Email CVA - changeEvent received:', value);
+      console.log('Email CVA - changeEvent event.detail:', event.detail);
+      console.log('Email CVA - changeEvent event.target:', event.target);
       this.currentValue = value; // Almacenar el valor actual
       this.onChange(value);
     });
@@ -41,10 +55,10 @@ export class EmailControlValueAccessorDirective implements ControlValueAccessor,
     // Listen to blurEvent from std-input
     this.elementRef.nativeElement.addEventListener('blurEvent', (event: any) => {
       console.log('Email CVA - blurEvent received, currentValue:', this.currentValue);
-      // Usar el valor almacenado si el evento no tiene valor
-      if (this.currentValue) {
-        this.onChange(this.currentValue);
-      }
+      // Obtener el valor actual del elemento
+      const currentValue = this.getCurrentValue();
+      console.log('Email CVA - blurEvent using getCurrentValue:', currentValue);
+      this.onChange(currentValue);
       this.onTouched();
     });
 
@@ -64,10 +78,10 @@ export class EmailControlValueAccessorDirective implements ControlValueAccessor,
     // Also listen to native blur events as fallback
     this.elementRef.nativeElement.addEventListener('blur', (event: any) => {
       console.log('Email CVA - native blur event, currentValue:', this.currentValue);
-      // Usar el valor almacenado si el evento no tiene valor
-      if (this.currentValue) {
-        this.onChange(this.currentValue);
-      }
+      // Obtener el valor actual del elemento
+      const currentValue = this.getCurrentValue();
+      console.log('Email CVA - native blur using getCurrentValue:', currentValue);
+      this.onChange(currentValue);
       this.onTouched();
     });
   }
