@@ -55,6 +55,15 @@ export class FormFieldComponent {
     this.valueChange.emit(newValue);
   }
 
+  onChangeEvent(event: any): void {
+    const newValue = event.detail || event.target?.value || '';
+    console.log('FormField onChangeEvent - event:', event);
+    console.log('FormField onChangeEvent - event.detail:', event.detail);
+    console.log('FormField onChangeEvent - event.target:', event.target);
+    console.log('FormField onChangeEvent - newValue:', newValue);
+    this.valueChange.emit(newValue);
+  }
+
   onFocus(event: any): void {
     this.focus.emit();
   }

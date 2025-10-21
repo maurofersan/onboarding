@@ -9,7 +9,9 @@
     [status]="hasError ? 'error' : 'default'"
     [appNumbersOnly]="shouldUseNumbersOnly()"
     [appDniValidation]="shouldUseDniValidation()"
+    [appEmailControlValueAccessor]="config.type === 'email'"
     (stdInput)="onInputChange($event)"
+    (changeEvent)="onChangeEvent($event)"
     (focus)="onFocus($event)"
     (blur)="onBlur($event)"
   />
