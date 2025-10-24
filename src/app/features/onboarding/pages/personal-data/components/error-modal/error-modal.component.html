@@ -1,0 +1,19 @@
+<div class="error-modal" [class.error-modal--show]="isVisible">
+  <div class="error-modal__overlay" (click)="onOverlayClick()"></div>
+  <div class="error-modal__content">
+    <div class="error-modal__icon">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="8" width="32" height="32" rx="8" fill="#e74c3c"/>
+        <rect x="12" y="12" width="24" height="24" rx="4" fill="white"/>
+        <path d="M24 16V24M24 28H24.01" stroke="#e74c3c" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h2 class="error-modal__title">Aún no encontramos tu solicitud</h2>
+    <p class="error-modal__message">
+      Indícale al asesor que te está ayudando que valide si registró tu solicitud correctamente.
+    </p>
+    <button class="error-modal__button" (click)="onClose()">
+      Reintentar
+    </button>
+  </div>
+</div>

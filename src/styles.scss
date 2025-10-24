@@ -23,6 +23,30 @@ std-button {
 
 std-checkbox {
   display: inline-block;
+  
+  &[status="error"] {
+    --border-color: #e74c3c !important;
+    --border-color-focus: #e74c3c !important;
+    
+    input[type="checkbox"] {
+      border: 1px solid #e74c3c !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
+std-input {
+  display: inline-block;
+  
+  input {
+    border: 1px solid #000000 !important;
+    transition: border-color 0.2s ease !important;
+  }
+  
+  &.form-field__input--error input {
+    border: 1px solid #e74c3c !important;
+    box-shadow: none !important;
+  }
 }
 
 /* Utility classes */

@@ -1,0 +1,30 @@
+<div class="form-field">
+  <std-input
+    class="form-field__input"
+    [type]="fieldType()"
+    [label]="config.label"
+    [placeholder]="config.placeholder"
+    [value]="value"
+    [maxlength]="maxLength()"
+    [status]="hasError ? 'error' : 'default'"
+    [appNumbersOnly]="shouldUseNumbersOnly()"
+    [appDniValidation]="shouldUseDniValidation()"
+    [appEmailControlValueAccessor]="config.type === 'email'"
+    (stdInput)="onInputChange($event)"
+    (changeEvent)="onChangeEvent($event)"
+    (focus)="onFocus($event)"
+    (blur)="onBlur($event)"
+  />
+  
+  <div 
+    class="form-field__error"
+    [class.form-field__error--hidden]="!hasError"
+  >
+    <std-image
+      class="form-field__error__icon"
+      src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggMTJDNi4zNDMgMTIgNSAxMC42NTcgNSA5QzUgNy4zNDMgNi4zNDMgNiA4IDZDOS42NTcgNiAxMSA3LjM0MyAxMSA5QzExIDEwLjY1NyA5LjY1NyAxMiA4IDEyWiIgZmlsbD0iI0U3NEMzQyIvPgo8cGF0aCBkPSJNNyA5SDlWMTFIOVY5WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+"
+      alt="Error icon"
+    />
+    <span class="form-field__error__text">{{ config.errorMessage }}</span>
+  </div>
+</div>
