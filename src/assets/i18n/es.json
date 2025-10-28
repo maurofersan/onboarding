@@ -2,8 +2,8 @@
   "accountOpening": {
     "welcome": {
       "title": {
-        "prefix": "Abre tu cuenta de ahorros en",
-        "highlight": "minutos"
+        "prefix": "Abre tu cuenta de",
+        "highlight": "en minutos"
       },
       "features": {
         "transfer": "Recibe transferencias desde el primer día",
@@ -66,6 +66,12 @@
           }
         },
         "continueButton": "Continuar"
+      },
+      "errorModal": {
+        "title": "Aún no encontramos tu solicitud",
+        "message": "Indícale al asesor que te está ayudando que valide si registró tu solicitud correctamente.",
+        "retryButton": "Reintentar",
+        "findAgencyLink": "Encuentra tu agencia más cercana"
       }
     }
   },
