@@ -101,6 +101,7 @@
               <std-checkbox
                 [checked]="formData().recaptchaValid"
                 (stdChange)="onRecaptchaChange($event)"
+                (click)="onRecaptchaClick($event)"
               />
               <span class="personal-data-page__recaptcha__text">No soy un robot</span>
               <div class="personal-data-page__recaptcha__branding">
