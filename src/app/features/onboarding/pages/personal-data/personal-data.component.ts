@@ -8,7 +8,6 @@ import {
   AfterViewInit,
   ElementRef,
   OnChanges,
-  ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -24,18 +23,7 @@ import { FormFieldComponent } from '../../../account-opening/components/form-fie
 import { ErrorModalComponent } from './components/error-modal/error-modal.component';
 import { PrivacyModalComponent } from './components/privacy-modal/privacy-modal.component';
 import { FormFieldConfig } from '../../../account-opening/components/form-field/form-field.component';
-
-// Declaración de tipos para reCAPTCHA Enterprise
-declare global {
-  interface Window {
-    grecaptcha: {
-      enterprise: {
-        ready: (callback: () => void) => void;
-        execute: (siteKey: string, options: { action: string }) => Promise<string>;
-      };
-    };
-  }
-}
+import { CaptchaService } from '../../../../core/services/captcha.service';
 
 @Component({
   selector: 'app-personal-data',
@@ -49,6 +37,7 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
   private readonly textService = inject(TextService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+  private readonly captchaService = inject(CaptchaService);
 
   // FormGroup para el email
   emailForm!: FormGroup;
@@ -67,24 +56,18 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     return hasError;
   });
   private readonly elementRef = inject(ElementRef);
-  @ViewChild('recaptchaCheckbox') recaptchaCheckboxRef?: ElementRef<any>;
 
   // Form data - empty by default
   formData = signal<Partial<AccountOpeningFormData>>({
     dni: '', // Empty DNI field
     phone: '',
     email: '',
-    taxDeclaration: false, // "No" selected by default
+    taxDeclaration: true, // "Sí" selected by default
     privacyAccepted: false,
-    recaptchaValid: false,
   });
 
   // reCAPTCHA token
   recaptchaToken = signal<string>('');
-
-  // reCAPTCHA configuration
-  private readonly RECAPTCHA_SITE_KEY = '6LfdTPsrAAAAABBUu3h6C6PLi-Kcn8IuvrFbh8Cf';
-  private readonly RECAPTCHA_ACTION = 'ACCOUNT_OPENING';
 
 
   // Errors state - empty by default, only show when user enters invalid data
@@ -170,7 +153,6 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
       data.phone &&
       data.email &&
       data.privacyAccepted &&
-      data.recaptchaValid &&
       this.errors().length === 0
     );
   });
@@ -197,9 +179,6 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     this.emailForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
-    
-    // Verificar reCAPTCHA al inicializar
-    this.checkRecaptchaAvailability();
   }
 
   ngAfterViewInit(): void {
@@ -676,14 +655,9 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     const valid = event.detail?.checked || event.target?.checked || false;
     console.log('🔄 reCAPTCHA checkbox changed:', valid);
     
-    this.updateField('recaptchaValid', valid);
-    
     if (valid) {
       console.log('✅ Checkbox is checked - Generating reCAPTCHA token...');
-      // Agregar un pequeño delay para asegurar que el estado se actualice
-      setTimeout(() => {
-        this.generateRecaptchaToken();
-      }, 100);
+      this.validateCaptcha();
     } else {
       console.log('❌ Checkbox is unchecked - Clearing reCAPTCHA token...');
       this.recaptchaToken.set('');
@@ -694,142 +668,37 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    * Handles reCAPTCHA click event
    */
   onRecaptchaClick(event: any): void {
-    // Obtener el estado actual del formulario
-    const currentState = this.formData().recaptchaValid;
+    // Obtener el estado actual del checkbox
+    const checkbox = event.target as any;
+    const isChecked = checkbox.checked || false;
     
-    // Toggle el estado manualmente
-    const newState = !currentState;
-    console.log('🖱️ reCAPTCHA checkbox toggled to:', newState);
+    console.log('🖱️ reCAPTCHA checkbox clicked, current state:', isChecked);
     
-    // Actualizar el estado del formulario
-    this.updateField('recaptchaValid', newState);
-    
-    // Forzar la actualización del checkbox en el DOM (solo el de reCAPTCHA)
-    setTimeout(() => {
-      const checkbox = this.recaptchaCheckboxRef?.nativeElement as any;
-      if (checkbox) {
-        checkbox.checked = newState;
-        
-        if (newState) {
-          console.log('✅ Checkbox is checked - Generating reCAPTCHA token...');
-          this.generateRecaptchaToken();
-        } else {
-          console.log('❌ Checkbox is unchecked - Clearing reCAPTCHA token...');
-          this.recaptchaToken.set('');
-        }
-      }
-    }, 10);
-  }
-
-  /**
-   * Generates reCAPTCHA Enterprise token
-   */
-  private async generateRecaptchaToken(): Promise<void> {
-    try {
-      console.log('=== STARTING reCAPTCHA TOKEN GENERATION ===');
-      console.log('Checking reCAPTCHA availability...');
-      
-      if (typeof window === 'undefined') {
-        console.error('❌ Window object not available');
-        return;
-      }
-      
-      if (!window.grecaptcha) {
-        console.error('❌ reCAPTCHA Enterprise not loaded. Make sure the script is included in index.html');
-        console.log('Available window properties:', Object.keys(window).filter(key => key.includes('recaptcha') || key.includes('grecaptcha')));
-        return;
-      }
-      
-      if (!window.grecaptcha.enterprise) {
-        console.error('❌ reCAPTCHA Enterprise API not available');
-        console.log('Available grecaptcha properties:', Object.keys(window.grecaptcha));
-        return;
-      }
-      
-      console.log('✅ reCAPTCHA Enterprise is available, generating token...');
-      console.log('Site Key:', this.RECAPTCHA_SITE_KEY);
-      console.log('Action:', this.RECAPTCHA_ACTION);
-      
-      // Usar callback en lugar de await para ready()
-      console.log('Waiting for reCAPTCHA to be ready...');
-      
-      return new Promise<void>((resolve, reject) => {
-        window.grecaptcha.enterprise.ready(async () => {
-          try {
-            console.log('✅ reCAPTCHA Enterprise is ready');
-            
-            // Generar el token
-            console.log('Executing reCAPTCHA...');
-            const token = await window.grecaptcha.enterprise.execute(this.RECAPTCHA_SITE_KEY, {
-              action: this.RECAPTCHA_ACTION
-            });
-            
-            console.log('🎉 reCAPTCHA token generated successfully!');
-            console.log('Token (first 50 chars):', token.substring(0, 50) + '...');
-            console.log('Full token:', token);
-            
-            this.recaptchaToken.set(token);
-            
-            // Enviar el token al backend
-            this.sendTokenToBackend(token);
-            
-            resolve();
-          } catch (error) {
-            console.error('❌ Error executing reCAPTCHA:', error);
-            reject(error);
-          }
-        });
-      });
-      
-    } catch (error) {
-      console.error('❌ Error generating reCAPTCHA token:', error);
-      console.error('Error details:', {
-        name: error instanceof Error ? error.name : 'Unknown',
-        message: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : 'No stack trace'
-      });
-    }
-  }
-
-
-  /**
-   * Checks if reCAPTCHA Enterprise is available
-   */
-  private checkRecaptchaAvailability(): void {
-    console.log('Checking reCAPTCHA availability on init...');
-    
-    if (typeof window !== 'undefined' && window.grecaptcha) {
-      console.log('reCAPTCHA Enterprise is available');
+    if (isChecked) {
+      console.log('✅ Checkbox is checked - Generating reCAPTCHA token...');
+      this.validateCaptcha();
     } else {
-      console.warn('reCAPTCHA Enterprise not loaded yet. Will retry when checkbox is clicked.');
+      console.log('❌ Checkbox is unchecked - Clearing reCAPTCHA token...');
+      this.recaptchaToken.set('');
     }
   }
 
   /**
-   * Sends the reCAPTCHA token to the backend
+   * Validates reCAPTCHA using the service
    */
-  private async sendTokenToBackend(token: string): Promise<void> {
-    try {
-      // Aquí implementarías la llamada al backend
-      // Por ejemplo, usando HttpClient
-      console.log('Sending token to backend:', token);
-      
-      // Ejemplo de payload para el backend:
-      const payload = {
-        event: {
-          token: token,
-          expectedAction: this.RECAPTCHA_ACTION,
-          siteKey: this.RECAPTCHA_SITE_KEY
-        }
-      };
-      
-      console.log('Payload for backend:', payload);
-      
-      // TODO: Implementar llamada HTTP al backend
-      // const response = await this.httpClient.post('https://recaptchaenterprise.googleapis.com/v1/projects/santander-476616/assessments?key=API_KEY', payload);
-      
-    } catch (error) {
-      console.error('Error sending token to backend:', error);
-    }
+  validateCaptcha(): void {
+    this.captchaService.getToken('account_opening').then(token => {
+      console.log('Token generado:', token);
+      this.recaptchaToken.set(token);
+
+      // Enviamos token al backend (Spring Boot)
+      this.captchaService.validateToken(token)
+        .subscribe(res => {
+          console.log('Respuesta del backend:', res);
+          // Aquí puedes manejar la respuesta del backend
+        });
+    }).catch(error => {
+      console.error('Error generando token reCAPTCHA:', error);
+    });
   }
 }
