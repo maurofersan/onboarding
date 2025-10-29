@@ -8,6 +8,7 @@ import {
   AfterViewInit,
   ElementRef,
   OnChanges,
+  ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -66,6 +67,7 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     return hasError;
   });
   private readonly elementRef = inject(ElementRef);
+  @ViewChild('recaptchaCheckbox') recaptchaCheckboxRef?: ElementRef<any>;
 
   // Form data - empty by default
   formData = signal<Partial<AccountOpeningFormData>>({
@@ -702,9 +704,9 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     // Actualizar el estado del formulario
     this.updateField('recaptchaValid', newState);
     
-    // Forzar la actualización del checkbox en el DOM
+    // Forzar la actualización del checkbox en el DOM (solo el de reCAPTCHA)
     setTimeout(() => {
-      const checkbox = this.elementRef.nativeElement.querySelector('std-checkbox');
+      const checkbox = this.recaptchaCheckboxRef?.nativeElement as any;
       if (checkbox) {
         checkbox.checked = newState;
         
