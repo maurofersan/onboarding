@@ -1,8 +1,9 @@
 <div class="form-field">
+  <label class="form-field__label">{{ config.label }}</label>
   <std-input
     class="form-field__input"
     [type]="fieldType()"
-    [label]="config.label"
+    [label]="''"
     [placeholder]="config.placeholder"
     [value]="value"
     [maxlength]="maxLength()"
