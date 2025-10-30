@@ -98,9 +98,13 @@
         <div class="personal-data-page__field">
           <div class="personal-data-page__recaptcha">
             <div class="personal-data-page__recaptcha__container">
-              <std-checkbox
-                (stdChange)="onRecaptchaChange($event)"
+              <input
+                type="checkbox"
+                class="personal-data-page__recaptcha__native-checkbox"
+                (change)="onRecaptchaChange($event)"
                 (click)="onRecaptchaClick($event)"
+                [disabled]="recaptchaLocked()"
+                aria-label="No soy un robot"
               />
               <span class="personal-data-page__recaptcha__text">No soy un robot</span>
               <div class="personal-data-page__recaptcha__branding">

@@ -68,6 +68,8 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
 
   // reCAPTCHA token
   recaptchaToken = signal<string>('');
+  // Lock recaptcha after success
+  recaptchaLocked = signal<boolean>(false);
 
 
   // Errors state - empty by default, only show when user enters invalid data
@@ -658,9 +660,14 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     if (valid) {
       console.log('✅ Checkbox is checked - Generating reCAPTCHA token...');
       this.validateCaptcha();
+      this.recaptchaLocked.set(true);
     } else {
       console.log('❌ Checkbox is unchecked - Clearing reCAPTCHA token...');
       this.recaptchaToken.set('');
+      // Evitar volver atrás si ya está bloqueado
+      if (this.recaptchaLocked()) {
+        this.recaptchaLocked.set(true);
+      }
     }
   }
 
@@ -677,9 +684,13 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     if (isChecked) {
       console.log('✅ Checkbox is checked - Generating reCAPTCHA token...');
       this.validateCaptcha();
+      this.recaptchaLocked.set(true);
     } else {
       console.log('❌ Checkbox is unchecked - Clearing reCAPTCHA token...');
       this.recaptchaToken.set('');
+      if (this.recaptchaLocked()) {
+        this.recaptchaLocked.set(true);
+      }
     }
   }
 

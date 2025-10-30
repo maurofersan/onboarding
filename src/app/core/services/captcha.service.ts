@@ -10,7 +10,7 @@ export class CaptchaService {
 
   constructor(private http: HttpClient) {}
 
-  private siteKey = '6LfMpvsrAAAAAIOOQotchf1R_vNUELAPowGL1dOB'; // Clave pública de Google
+  private siteKey = '6LfdTPsrAAAAABBUu3h6C6PLi-Kcn8IuvrFbh8Cf'; // Clave pública de Google
 
   getToken(action: string): Promise<string> {
     return new Promise((resolve, reject) => {
