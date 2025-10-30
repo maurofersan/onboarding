@@ -60,6 +60,14 @@
     margin-bottom: 0;
   }
 
+  /* horizontal divider after the disclaimer */
+  .divider {
+    margin: 30px 0 -30px;
+    height: 1px;
+    border: 0;
+    background: #e9ecef;
+  }
+
   &__checkbox {
     display: flex;
     align-items: flex-start;
@@ -85,7 +93,6 @@
       &__highlight {
         color: #127277;
         font-weight: 600;
-        text-decoration: underline;
         cursor: pointer;
 
         &:hover {
