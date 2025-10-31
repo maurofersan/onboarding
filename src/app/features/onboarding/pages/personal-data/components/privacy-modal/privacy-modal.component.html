@@ -3,10 +3,9 @@
   <div class="privacy-modal__content">
     <!-- Header -->
     <div class="privacy-modal__header">
-      <h2 class="privacy-modal__title">{{ title }}</h2>
       <button class="privacy-modal__close" (click)="onClose($event)">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
     </div>
@@ -15,27 +14,27 @@
     <div class="privacy-modal__body">
       <h3 class="privacy-modal__question">{{ question }}</h3>
       
-      <p class="privacy-modal__intro">{{ intro }}</p>
-      
       <div class="privacy-modal__point">
         <strong>1.</strong> {{ point1 }}
       </div>
       
       <div class="privacy-modal__point">
         <strong>2.</strong> {{ point2 }}
-        <ul class="privacy-modal__sublist">
-          <li>{{ point2a }}</li>
-          <li>{{ point2b }}</li>
-        </ul>
+        <div class="privacy-modal__sublist">
+          <div class="privacy-modal__subpoint"><strong>a.</strong> {{ point2a }}</div>
+          <div class="privacy-modal__subpoint"><strong>b.</strong> {{ point2b }}</div>
+        </div>
       </div>
       
       <div class="privacy-modal__point">
         <strong>3.</strong> {{ point3 }}
-        <ul class="privacy-modal__sublist">
-          <li>{{ point3a }}</li>
-          <li>{{ point3b }}</li>
-          <li>{{ point3c }}</li>
-        </ul>
+        <div class="privacy-modal__sublist">
+          <div class="privacy-modal__subpoint"><strong>a.</strong> {{ point3a }}</div>
+        </div>
+      </div>
+      
+      <div class="privacy-modal__recuerda" *ngIf="recuerda">
+        <span [innerHTML]="formatTextWithEmail(recuerda)"></span>
       </div>
       
       <div class="privacy-modal__point">
@@ -51,19 +50,15 @@
       </div>
       
       <div class="privacy-modal__point">
-        <strong>7.</strong> {{ point7 }}
+        <strong>7.</strong> <span [innerHTML]="formatTextWithEmail(point7)"></span>
       </div>
       
       <div class="privacy-modal__point">
-        <strong>8.</strong> {{ point8 }}
+        <strong>8.</strong> <span [innerHTML]="formatTextWithEmail(point8)"></span>
       </div>
       
       <div class="privacy-modal__point">
-        <strong>9.</strong> {{ point9 }}
-      </div>
-      
-      <div class="privacy-modal__signature">
-        {{ signature }}
+        <strong>9.</strong> <span [innerHTML]="formatTextWithEmail(point9)"></span>
       </div>
     </div>
 
