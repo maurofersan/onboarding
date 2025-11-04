@@ -24,6 +24,20 @@ module.exports = {
   experiments: {
     outputModule: true,
   },
+  // Configurar proxy para desarrollo
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        secure: false,
+        changeOrigin: true,
+        logLevel: 'debug',
+        pathRewrite: {
+          '^/api': ''
+        }
+      }
+    }
+  },
   plugins: [
     new ModuleFederationPlugin({
       library: { type: "module" },

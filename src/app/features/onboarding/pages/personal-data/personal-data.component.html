@@ -84,6 +84,7 @@
               [checked]="formData().privacyAccepted"
               [status]="hasFieldError('privacyAccepted')() ? 'error' : 'default'"
               (stdChange)="onPrivacyChange($event)"
+              (click)="onPrivacyClick($event)"
               (blur)="onPrivacyBlur()"
               class="personal-data-page__checkbox__input"
             />

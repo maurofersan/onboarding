@@ -24,6 +24,7 @@ import { ErrorModalComponent } from './components/error-modal/error-modal.compon
 import { PrivacyModalComponent } from './components/privacy-modal/privacy-modal.component';
 import { FormFieldConfig } from '../../../account-opening/components/form-field/form-field.component';
 import { CaptchaService } from '../../../../core/services/captcha.service';
+import { AccountOpeningApiService } from '../../../../core/services/account-opening-api.service';
 
 @Component({
   selector: 'app-personal-data',
@@ -38,6 +39,7 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly captchaService = inject(CaptchaService);
+  private readonly accountOpeningApiService = inject(AccountOpeningApiService);
 
   // FormGroup para el email
   emailForm!: FormGroup;
@@ -348,21 +350,120 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    * Handles privacy checkbox change with validation
    */
   onPrivacyChange(event: any): void {
-    const accepted = event.detail?.checked || event.target?.checked || false;
-    console.log('Privacy checkbox changed:', accepted);
+    console.log('🔍 onPrivacyChange event received:', event);
+    console.log('🔍 Event detail:', event.detail);
+    console.log('🔍 Event target:', event.target);
+    
+    // Intentar obtener el valor del checkbox de múltiples formas
+    let accepted = false;
+    
+    // Método 1: desde event.detail.checked
+    if (event.detail !== undefined && event.detail.checked !== undefined) {
+      accepted = event.detail.checked;
+      console.log('✅ Got value from event.detail.checked:', accepted);
+    }
+    // Método 2: desde event.target.checked
+    else if (event.target?.checked !== undefined) {
+      accepted = event.target.checked;
+      console.log('✅ Got value from event.target.checked:', accepted);
+    }
+    // Método 3: desde event.detail directamente (si es boolean)
+    else if (typeof event.detail === 'boolean') {
+      accepted = event.detail;
+      console.log('✅ Got value from event.detail (boolean):', accepted);
+    }
+    // Método 4: desde event.target directamente
+    else if (event.target && typeof event.target === 'object') {
+      // Intentar obtener el valor actual del checkbox desde el DOM
+      const checkbox = event.target as HTMLElement;
+      const nativeCheckbox = checkbox.querySelector?.('input[type="checkbox"]') as HTMLInputElement;
+      if (nativeCheckbox) {
+        accepted = nativeCheckbox.checked;
+        console.log('✅ Got value from native checkbox:', accepted);
+      } else {
+        // Si es un elemento std-checkbox, intentar obtener el valor desde el componente
+        const stdCheckbox = checkbox as any;
+        if (stdCheckbox.checked !== undefined) {
+          accepted = stdCheckbox.checked;
+          console.log('✅ Got value from std-checkbox.checked:', accepted);
+        } else if (stdCheckbox.value !== undefined) {
+          accepted = stdCheckbox.value;
+          console.log('✅ Got value from std-checkbox.value:', accepted);
+        }
+      }
+    }
+    // Método 5: invertir el valor actual si no podemos obtenerlo del evento
+    else {
+      // Si no podemos obtener el valor del evento, usar el valor opuesto del estado actual
+      accepted = !this.formData().privacyAccepted;
+      console.log('⚠️ Could not get value from event, toggling current value:', accepted);
+    }
+    
+    console.log('✅ Final accepted value:', accepted);
+    console.log('📊 Current formData().privacyAccepted:', this.formData().privacyAccepted);
+    
+    // Actualizar el campo
     this.updateField('privacyAccepted', accepted);
+    
+    // Validar el checkbox
     this.validatePrivacyCheckbox(accepted);
-    // Apply styles after validation with multiple attempts
+    
+    // Verificar que se actualizó correctamente
     setTimeout(() => {
-      console.log('Applying checkbox styles, hasError:', this.hasFieldError('privacyAccepted')());
+      const currentValue = this.formData().privacyAccepted;
+      console.log('✅ After update, formData().privacyAccepted:', currentValue);
+      console.log('✅ Has error:', this.hasFieldError('privacyAccepted')());
       this.applyCheckboxErrorStyles();
     }, 0);
     
-    // Force another update after a longer delay
+    // Segundo intento después de un pequeño delay
     setTimeout(() => {
-      console.log('Second attempt to apply styles');
       this.applyCheckboxErrorStyles();
     }, 100);
+  }
+
+  /**
+   * Handles privacy checkbox click event
+   * Este método asegura que el checkbox se actualice correctamente cuando el usuario hace clic
+   */
+  onPrivacyClick(event: any): void {
+    // Pequeño delay para permitir que el componente std-checkbox actualice su estado interno primero
+    setTimeout(() => {
+      console.log('🖱️ Privacy checkbox clicked, current state:', this.formData().privacyAccepted);
+      
+      // Intentar obtener el valor del checkbox desde el DOM
+      const checkboxElement = event.target as any;
+      let checked = false;
+      
+      // Intentar diferentes métodos para obtener el valor
+      if (checkboxElement?.checked !== undefined) {
+        checked = checkboxElement.checked;
+      } else if (checkboxElement?.shadowRoot) {
+        const input = checkboxElement.shadowRoot.querySelector('input[type="checkbox"]');
+        if (input) {
+          checked = (input as HTMLInputElement).checked;
+        }
+      } else {
+        // Si no podemos obtener el valor, togglear el estado actual
+        checked = !this.formData().privacyAccepted;
+      }
+      
+      console.log('✅ Checkbox checked value:', checked);
+      console.log('📊 Current formData().privacyAccepted:', this.formData().privacyAccepted);
+      
+      // Solo actualizar si el valor es diferente
+      if (checked !== this.formData().privacyAccepted) {
+        console.log('🔄 Updating privacyAccepted from', this.formData().privacyAccepted, 'to', checked);
+        this.updateField('privacyAccepted', checked);
+        this.validatePrivacyCheckbox(checked);
+        
+        // Verificar después de actualizar
+        setTimeout(() => {
+          console.log('✅ After update, formData().privacyAccepted:', this.formData().privacyAccepted);
+          console.log('✅ Has error:', this.hasFieldError('privacyAccepted')());
+        }, 50);
+      }
+    }, 10);
   }
 
   /**
@@ -581,20 +682,125 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    * Handles form submission
    */
   async onSubmit(): Promise<void> {
-    if (this.isFormValid()) {
-      console.log('Form submitted:', this.formData());
-      console.log('reCAPTCHA token:', this.recaptchaToken());
+    const formData = this.formData();
+    
+    // Validar todos los campos antes de enviar
+    this.validateFormBeforeSubmit();
+    
+    // Verificar si el formulario es válido después de la validación
+    if (!this.isFormValid()) {
+      console.log('Form is not valid, cannot submit');
+      console.log('Form data:', formData);
+      console.log('Errors:', this.errors());
       
-      // Aquí puedes enviar todos los datos del formulario junto con el token
-      const formPayload = {
-        ...this.formData(),
-        recaptchaToken: this.recaptchaToken()
-      };
-      
-      console.log('Complete form payload:', formPayload);
-      
-      // Navigate to next step or show success
+      // Mostrar errores específicos
+      if (!formData.privacyAccepted) {
+        console.warn('⚠️ El checkbox de políticas de privacidad debe estar marcado');
+      }
+      return;
     }
+
+    console.log('Form submitted:', formData);
+    console.log('reCAPTCHA token:', this.recaptchaToken());
+
+    // Preparar el payload para la API según el formato de Postman
+    const apiRequest = {
+      documentType: '0ed651ca-908b-4f83-9626-d6b4740497e7', // UUID fijo según la imagen de Postman
+      documentNumber: formData.dni || '',
+      phoneNumber: formData.phone || '',
+      email: formData.email || '',
+      isPeruvian: formData.taxDeclaration ? 'S' : 'N', // Convertir boolean a "S" o "N"
+      acceptedPrivacyPolicy: formData.privacyAccepted ? 'S' : 'N', // Convertir boolean a "S" o "N"
+    };
+
+    console.log('API Request payload:', apiRequest);
+
+    try {
+      // Consumir el servicio de API
+      this.accountOpeningApiService.createAccount(apiRequest).subscribe({
+        next: (response) => {
+          console.log('✅ API Response received:', response);
+          console.log('✅ Success! La respuesta se muestra en DevTools Network');
+          // La respuesta se mostrará automáticamente en DevTools Network
+        },
+        error: (error) => {
+          console.error('❌ API Error:', error);
+          
+          // Información detallada del error
+          if (error.status === 0) {
+            console.error('❌ Error de conexión: El servidor no está disponible o hay un problema de CORS');
+            console.error('💡 Asegúrate de que el servidor esté corriendo en http://localhost:3000');
+          } else if (error.status === 404) {
+            console.error('❌ Error 404: El endpoint no existe');
+            console.error('💡 Verifica que la ruta /redis/create esté configurada en el servidor');
+          } else if (error.status === 405) {
+            console.error('❌ Error 405: Método no permitido');
+            console.error('💡 El servidor no acepta peticiones POST en este endpoint');
+          } else {
+            console.error(`❌ Error ${error.status}: ${error.message || 'Error desconocido'}`);
+          }
+          
+          console.error('Error completo:', error);
+        },
+      });
+    } catch (error) {
+      console.error('Error calling API:', error);
+    }
+  }
+
+  /**
+   * Valida todos los campos del formulario antes de enviar
+   */
+  private validateFormBeforeSubmit(): void {
+    const data = this.formData();
+    
+    // Validar DNI
+    if (!data.dni || !/^\d{8}$/.test(data.dni)) {
+      this.errors.update(errors => {
+        const filtered = errors.filter(e => e.field !== 'dni');
+        if (!data.dni) {
+          return [...filtered, { field: 'dni' as keyof AccountOpeningFormData, message: 'El DNI es requerido' }];
+        } else {
+          return [...filtered, { field: 'dni' as keyof AccountOpeningFormData, message: 'El DNI debe tener 8 dígitos' }];
+        }
+      });
+    } else {
+      // Limpiar error si el DNI es válido
+      this.errors.update(errors => errors.filter(e => e.field !== 'dni'));
+    }
+    
+    // Validar teléfono
+    if (!data.phone || !/^\d{9}$/.test(data.phone)) {
+      this.errors.update(errors => {
+        const filtered = errors.filter(e => e.field !== 'phone');
+        if (!data.phone) {
+          return [...filtered, { field: 'phone' as keyof AccountOpeningFormData, message: 'El celular es requerido' }];
+        } else {
+          return [...filtered, { field: 'phone' as keyof AccountOpeningFormData, message: 'El celular debe tener 9 dígitos' }];
+        }
+      });
+    } else {
+      // Limpiar error si el teléfono es válido
+      this.errors.update(errors => errors.filter(e => e.field !== 'phone'));
+    }
+    
+    // Validar email
+    if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      this.errors.update(errors => {
+        const filtered = errors.filter(e => e.field !== 'email');
+        if (!data.email) {
+          return [...filtered, { field: 'email' as keyof AccountOpeningFormData, message: 'El correo electrónico es requerido' }];
+        } else {
+          return [...filtered, { field: 'email' as keyof AccountOpeningFormData, message: 'Ingresa un correo electrónico válido' }];
+        }
+      });
+    } else {
+      // Limpiar error si el email es válido
+      this.errors.update(errors => errors.filter(e => e.field !== 'email'));
+    }
+    
+    // Validar checkbox de privacidad
+    this.validatePrivacyCheckbox(data.privacyAccepted || false);
   }
 
   /**
