@@ -72,6 +72,8 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
   recaptchaToken = signal<string>('');
   // Lock recaptcha after success
   recaptchaLocked = signal<boolean>(false);
+  // Track reCAPTCHA checkbox state
+  recaptchaChecked = signal<boolean>(false);
 
 
   // Errors state - empty by default, only show when user enters invalid data
@@ -157,6 +159,7 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
       data.phone &&
       data.email &&
       data.privacyAccepted &&
+      this.recaptchaToken() !== '' &&
       this.errors().length === 0
     );
   });
@@ -823,6 +826,8 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    */
   closeModal(): void {
     this.showModal.set(false);
+    // Restaurar el botón "Sí" cuando se cierra el modal
+    this.updateField('taxDeclaration', true);
   }
 
   /**
@@ -863,6 +868,9 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     const valid = event.detail?.checked || event.target?.checked || false;
     console.log('🔄 reCAPTCHA checkbox changed:', valid);
     
+    // Actualizar el estado del checkbox
+    this.recaptchaChecked.set(valid);
+    
     if (valid) {
       console.log('✅ Checkbox is checked - Generating reCAPTCHA token...');
       this.validateCaptcha();
@@ -870,10 +878,7 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     } else {
       console.log('❌ Checkbox is unchecked - Clearing reCAPTCHA token...');
       this.recaptchaToken.set('');
-      // Evitar volver atrás si ya está bloqueado
-      if (this.recaptchaLocked()) {
-        this.recaptchaLocked.set(true);
-      }
+      this.recaptchaLocked.set(false);
     }
   }
 
@@ -887,6 +892,9 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     
     console.log('🖱️ reCAPTCHA checkbox clicked, current state:', isChecked);
     
+    // Actualizar el estado del checkbox
+    this.recaptchaChecked.set(isChecked);
+    
     if (isChecked) {
       console.log('✅ Checkbox is checked - Generating reCAPTCHA token...');
       this.validateCaptcha();
@@ -894,9 +902,7 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     } else {
       console.log('❌ Checkbox is unchecked - Clearing reCAPTCHA token...');
       this.recaptchaToken.set('');
-      if (this.recaptchaLocked()) {
-        this.recaptchaLocked.set(true);
-      }
+      this.recaptchaLocked.set(false);
     }
   }
 
