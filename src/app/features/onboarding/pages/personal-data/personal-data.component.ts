@@ -8,10 +8,12 @@ import {
   AfterViewInit,
   ElementRef,
   OnChanges,
+  OnDestroy,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from '../../../../shared/base/base.component';
 import { TextService } from '../../../../core/services/text.service';
 import {
@@ -34,7 +36,7 @@ import { AccountOpeningApiService } from '../../../../core/services/account-open
   styleUrl: './personal-data.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PersonalDataComponent extends BaseComponent implements OnInit, AfterViewInit, OnChanges {
+export class PersonalDataComponent extends BaseComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   private readonly textService = inject(TextService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
@@ -43,6 +45,11 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
 
   // FormGroup para el email
   emailForm!: FormGroup;
+
+  // Signals para rastrear la validez de los campos en tiempo real
+  emailValid = signal<boolean>(false);
+  dniValid = signal<boolean>(false);
+  phoneValid = signal<boolean>(false);
 
   // Computed signal para el error del email
   readonly emailHasError = computed(() => {
@@ -154,10 +161,14 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
   // Computed properties - form is invalid by default to match the second image
   readonly isFormValid = computed(() => {
     const data = this.formData();
+    
     return (
       data.dni &&
+      this.dniValid() &&
       data.phone &&
+      this.phoneValid() &&
       data.email &&
+      this.emailValid() &&
       data.privacyAccepted &&
       this.recaptchaToken() !== '' &&
       this.errors().length === 0
@@ -186,6 +197,45 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     this.emailForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
+
+    // Suscribirse a los cambios del email para actualizar el signal en tiempo real
+    const emailControl = this.emailForm.get('email');
+    if (emailControl) {
+      // Suscribirse a valueChanges para capturar cambios en el valor
+      emailControl.valueChanges
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.emailValid.set(emailControl.valid);
+        });
+      
+      // También suscribirse a statusChanges para capturar cambios en la validación
+      emailControl.statusChanges
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.emailValid.set(emailControl.valid);
+        });
+      
+      // Actualizar el estado inicial
+      this.emailValid.set(emailControl.valid);
+      
+      // Si hay un valor inicial en formData, establecerlo
+      const initialEmail = this.formData().email;
+      if (initialEmail) {
+        emailControl.setValue(initialEmail, { emitEvent: false });
+        this.emailValid.set(emailControl.valid);
+      }
+    }
+    
+    // Inicializar validaciones de DNI y Celular si hay valores iniciales
+    const initialDni = this.formData().dni;
+    if (initialDni) {
+      this.validateDniRealtime(initialDni);
+    }
+    
+    const initialPhone = this.formData().phone;
+    if (initialPhone) {
+      this.validatePhoneRealtime(initialPhone);
+    }
   }
 
   ngAfterViewInit(): void {
@@ -254,26 +304,98 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
       console.log(`Updated formData for ${field}:`, newData);
       return newData;
     });
+    
+    // Validar en tiempo real para DNI y Celular
+    if (field === 'dni') {
+      this.validateDniRealtime(value);
+    } else if (field === 'phone') {
+      this.validatePhoneRealtime(value);
+    }
+  }
+
+  /**
+   * Validates DNI in real-time
+   * Actualiza el signal de validez siempre, pero solo muestra errores si el campo ha sido tocado
+   */
+  private validateDniRealtime(value: string): void {
+    const hasValue = value && value.trim() !== '';
+    const isValid = hasValue ? /^\d{8}$/.test(value) : false;
+    
+    // Actualizar el signal de validez siempre (para deshabilitar el botón)
+    this.dniValid.set(isValid);
+    
+    // Solo actualizar errores si el campo ha sido tocado
+    if (this.touchedFields().has('dni')) {
+      this.errors.update(errors => {
+        const filteredErrors = errors.filter(error => error.field !== 'dni');
+        let newErrors = [...filteredErrors];
+        
+        if (!hasValue) {
+          newErrors.push({ field: 'dni', message: 'El DNI es requerido' });
+        } else if (!isValid) {
+          newErrors.push({ field: 'dni', message: 'El DNI debe tener 8 dígitos' });
+        }
+        
+        return newErrors;
+      });
+    }
+  }
+
+  /**
+   * Validates Phone in real-time
+   * Actualiza el signal de validez siempre, pero solo muestra errores si el campo ha sido tocado
+   */
+  private validatePhoneRealtime(value: string): void {
+    const hasValue = value && value.trim() !== '';
+    const isValid = hasValue ? /^\d{9}$/.test(value) : false;
+    
+    // Actualizar el signal de validez siempre (para deshabilitar el botón)
+    this.phoneValid.set(isValid);
+    
+    // Solo actualizar errores si el campo ha sido tocado
+    if (this.touchedFields().has('phone')) {
+      this.errors.update(errors => {
+        const filteredErrors = errors.filter(error => error.field !== 'phone');
+        let newErrors = [...filteredErrors];
+        
+        if (!hasValue) {
+          newErrors.push({ field: 'phone', message: 'El celular es requerido' });
+        } else if (!isValid) {
+          newErrors.push({ field: 'phone', message: 'El celular debe tener 9 dígitos' });
+        }
+        
+        return newErrors;
+      });
+    }
   }
 
   updateEmailField(value: string): void {
     console.log('updateEmailField called with value:', value);
     
-    // Actualizar el FormControl
-    this.emailForm.get('email')?.setValue(value);
-    this.emailForm.get('email')?.markAsTouched();
-    this.emailForm.get('email')?.markAsDirty();
+    // Actualizar el FormControl con validación en tiempo real
+    const emailControl = this.emailForm.get('email');
+    if (emailControl) {
+      emailControl.setValue(value, { emitEvent: true });
+      // Marcar como touched y dirty para activar validación en tiempo real
+      emailControl.markAsTouched();
+      emailControl.markAsDirty();
+      // Actualizar el estado del formulario para que la validación se ejecute
+      emailControl.updateValueAndValidity({ emitEvent: true });
+      // Actualizar el signal de validez (valueChanges ya lo hará, pero esto asegura sincronización)
+      this.emailValid.set(emailControl.valid);
+    }
     
     // Actualizar el formData
     this.updateField('email', value);
     
     // Log del estado
     console.log('Email FormControl state:', {
-      value: this.emailForm.get('email')?.value,
-      invalid: this.emailForm.get('email')?.invalid,
-      touched: this.emailForm.get('email')?.touched,
-      dirty: this.emailForm.get('email')?.dirty,
-      errors: this.emailForm.get('email')?.errors
+      value: emailControl?.value,
+      invalid: emailControl?.invalid,
+      valid: emailControl?.valid,
+      touched: emailControl?.touched,
+      dirty: emailControl?.dirty,
+      errors: emailControl?.errors
     });
   }
 
@@ -295,6 +417,9 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    */
   onDniFocus(): void {
     this.onFieldFocus('dni');
+    // Validar en tiempo real cuando se enfoca para actualizar el estado del botón
+    const currentValue = this.formData().dni || '';
+    this.validateDniRealtime(currentValue);
   }
 
   /**
@@ -302,6 +427,8 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    */
   onDniBlur(value: string): void {
     console.log('onDniBlur called with value:', value);
+    // Validar en tiempo real también en blur
+    this.validateDniRealtime(value);
     this.validateDniOnBlur(value);
   }
 
@@ -310,6 +437,9 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    */
   onPhoneFocus(): void {
     this.onFieldFocus('phone');
+    // Validar en tiempo real cuando se enfoca para actualizar el estado del botón
+    const currentValue = this.formData().phone || '';
+    this.validatePhoneRealtime(currentValue);
   }
 
   /**
@@ -317,6 +447,8 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    */
   onPhoneBlur(value: string): void {
     console.log('onPhoneBlur called with value:', value);
+    // Validar en tiempo real también en blur
+    this.validatePhoneRealtime(value);
     this.validatePhoneOnBlur(value);
   }
 
