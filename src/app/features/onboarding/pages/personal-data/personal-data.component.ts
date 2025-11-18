@@ -226,7 +226,7 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
       }
     }
     
-    // Inicializar validaciones de DNI y Celular si hay valores iniciales
+    // Inicializar validaciones de DNI, Celular y Email si hay valores iniciales
     const initialDni = this.formData().dni;
     if (initialDni) {
       this.validateDniRealtime(initialDni);
@@ -235,6 +235,11 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
     const initialPhone = this.formData().phone;
     if (initialPhone) {
       this.validatePhoneRealtime(initialPhone);
+    }
+    
+    const initialEmail = this.formData().email;
+    if (initialEmail) {
+      this.validateEmailRealtime(initialEmail);
     }
   }
 
@@ -305,11 +310,25 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
       return newData;
     });
     
-    // Validar en tiempo real para DNI y Celular
+    // Si es email, también actualizar el FormControl
+    if (field === 'email') {
+      const emailControl = this.emailForm?.get('email');
+      if (emailControl) {
+        emailControl.setValue(value, { emitEvent: true });
+        emailControl.markAsTouched();
+        emailControl.markAsDirty();
+        emailControl.updateValueAndValidity({ emitEvent: true });
+        this.emailValid.set(emailControl.valid);
+      }
+    }
+    
+    // Validar en tiempo real para DNI, Celular y Email
     if (field === 'dni') {
       this.validateDniRealtime(value);
     } else if (field === 'phone') {
       this.validatePhoneRealtime(value);
+    } else if (field === 'email') {
+      this.validateEmailRealtime(value);
     }
   }
 
@@ -362,6 +381,34 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
           newErrors.push({ field: 'phone', message: 'El celular es requerido' });
         } else if (!isValid) {
           newErrors.push({ field: 'phone', message: 'El celular debe tener 9 dígitos' });
+        }
+        
+        return newErrors;
+      });
+    }
+  }
+
+  /**
+   * Validates Email in real-time
+   * Actualiza el signal de validez siempre, pero solo muestra errores si el campo ha sido tocado
+   */
+  private validateEmailRealtime(value: string): void {
+    const hasValue = value && value.trim() !== '';
+    const isValid = hasValue ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()) : false;
+    
+    // Actualizar el signal de validez siempre (para deshabilitar el botón)
+    this.emailValid.set(isValid);
+    
+    // Solo actualizar errores si el campo ha sido tocado
+    if (this.touchedFields().has('email')) {
+      this.errors.update(errors => {
+        const filteredErrors = errors.filter(error => error.field !== 'email');
+        let newErrors = [...filteredErrors];
+        
+        if (!hasValue) {
+          newErrors.push({ field: 'email', message: 'El correo electrónico es requerido' });
+        } else if (!isValid) {
+          newErrors.push({ field: 'email', message: 'Ingresa un correo electrónico válido' });
         }
         
         return newErrors;
@@ -457,6 +504,9 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
    */
   onEmailFocus(): void {
     this.onFieldFocus('email');
+    // Validar en tiempo real cuando se enfoca para actualizar el estado del botón
+    const currentValue = this.formData().email || '';
+    this.validateEmailRealtime(currentValue);
   }
 
   /**
@@ -477,6 +527,8 @@ export class PersonalDataComponent extends BaseComponent implements OnInit, Afte
       errors: this.emailForm.get('email')?.errors
     });
     
+    // Validar en tiempo real también en blur
+    this.validateEmailRealtime(value);
     // También ejecutar la validación personalizada
     this.validateEmailOnBlur(value);
   }
